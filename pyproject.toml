@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "request_bank_rko"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
   { name="plp-kolyan", email="plp-kolyan@mail.ru" },
 ]
