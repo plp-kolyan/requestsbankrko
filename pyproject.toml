@@ -1,7 +1,8 @@
 [build-system]
 requires = ["setuptools>=61.0",
             "garant_success_requests>=0.0.7",
-            "requests>=2.28",]
+            "requests>=2.28",
+			"jsoncustom>=0.0.2"]
 build-backend = "setuptools.build_meta"
 
 
@@ -11,7 +12,7 @@ version = "0.0.1"
 authors = [
   { name="plp-kolyan", email="plp-kolyan@mail.ru" },
 ]
-description = "Гарантированно успешные web-запросы"
+description = "Гарантированно успешные web-запросы в Банки РКО"
 readme = "README.md"
 license = { file="LICENSE" }
 requires-python = ">=3.7"

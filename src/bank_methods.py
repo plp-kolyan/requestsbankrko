@@ -1,6 +1,6 @@
 import time
 from datetime import timezone
-from JsonCustom import JsonCustom
+from jsoncustom import JsonCustom
 from custom_requests import (ResponseGarant, ResponseGarantTestBaseUrl, ResponseGarantTestEndpoint,
                              ResponseGarantTestHeaders)
 
@@ -18,7 +18,7 @@ def get_rand_str(total: int):
     return rand_str
 
 
-class Alfa(ResponseGarantTestHeaders):
+class ABSAlfa(ResponseGarantTestHeaders):
     headers = {'Content-Type': 'application/json; charset=UTF-8'}
     dict_key = None
     dict_key_test = None
@@ -29,7 +29,7 @@ class Alfa(ResponseGarantTestHeaders):
         self.url = 'https://partner.alfabank.ru/public-api/v2/'
 
 
-class CityBankes:
+class ABSCityBankes:
     cities_path = None
 
     def __init__(self):
@@ -42,10 +42,10 @@ class CityBankes:
             return self.JC.data
 
 
-class AlfaCity(CityBankes, Alfa):
+class ABSAlfaCity(ABSCityBankes, ABSAlfa):
     def __init__(self):
-        Alfa.__init__(self)
-        CityBankes.__init__(self)
+        ABSAlfa.__init__(self)
+        ABSCityBankes.__init__(self)
         self.test = False
 
     def get_response(self):
@@ -57,7 +57,7 @@ class AlfaCity(CityBankes, Alfa):
             return True
 
 
-class AlfaStatusLead(Alfa):
+class ABSAlfaStatusLead(ABSAlfa):
     def __init__(self, json, test=test):
         super().__init__(test)
         self.params = json
@@ -65,7 +65,7 @@ class AlfaStatusLead(Alfa):
         self.method = 'get'
 
 
-class AlfaScoring(Alfa):
+class ABSAlfaScoring(ABSAlfa):
     def __init__(self, json, test=test):
         super().__init__(test)
         self.json = json
@@ -87,7 +87,7 @@ class AlfaScoring(Alfa):
         return self.get_status_inn(200, inn_freedom)
 
 
-class AlfaLead(Alfa):
+class ABSAlfaLead(ABSAlfa):
     def __init__(self, json, test=test):
         super().__init__(test)
         self.limit_error = False
@@ -116,13 +116,13 @@ class AlfaLead(Alfa):
                             return self.response_json['errors'][0]['detail']
 
 
-class VTBBigFather(ResponseGarant):
+class ABSVTBBigFather(ResponseGarant):
     def __init__(self):
         super().__init__()
         self.url = 'https://epa.api.vtb.ru/openapi/smb/lecs/lead-impers/v1/'
 
 
-class VTBToken(VTBBigFather):
+class ABSVTBToken(ABSVTBBigFather):
     grant_type = None
     client_id = None
     client_secret = None
@@ -143,7 +143,7 @@ class VTBToken(VTBBigFather):
             return self.response_json['access_token']
 
 
-class VTBFather(VTBBigFather):
+class ABSVTBFather(ABSVTBBigFather):
     path_vtb_token = None
 
     def __init__(self, json):
@@ -158,7 +158,7 @@ class VTBFather(VTBBigFather):
                     return True
 
     def write_vtb_header(self):
-        vtbtoken = VTBToken()
+        vtbtoken = ABSVTBToken()
         rezult = vtbtoken.get_rezult()
         if vtbtoken.success is True:
             headers = {'Authorization': f'Bearer {rezult}'}
@@ -192,7 +192,7 @@ class VTBFather(VTBBigFather):
         return super().get_response_production()
 
 
-class VTBStatusLead(VTBFather):
+class ABSVTBStatusLead(ABSVTBFather):
     def __init__(self, json):
         super().__init__(json)
         self.params = json
@@ -200,7 +200,7 @@ class VTBStatusLead(VTBFather):
         self.method = 'get'
 
 
-class VTBScoring(VTBFather):
+class ABSVTBScoring(ABSVTBFather):
     def __init__(self, json):
         super().__init__(json)
         self.url += 'check_leads'
@@ -216,7 +216,7 @@ class VTBScoring(VTBFather):
         return do_json_father
 
 
-class VTBLead(VTBFather):
+class ABSVTBLead(ABSVTBFather):
     def __init__(self, json, test=test):
         super().__init__(json)
         self.test = test
@@ -231,7 +231,7 @@ class VTBLead(VTBFather):
         self.json_response_test = {"leads": data}
 
 
-class Open(ResponseGarantTestEndpoint):
+class ABSOpen(ResponseGarantTestEndpoint):
     base_url = 'https://openpartners.ru/api/v2/request/'
 
     def __init__(self):
@@ -242,7 +242,7 @@ class Open(ResponseGarantTestEndpoint):
         }
 
 
-class OpenStatusLead(Open):
+class ABSOpenStatusLead(ABSOpen):
     endpoint = 'status'
     endpoint_test = 'status/test'
 
@@ -253,7 +253,7 @@ class OpenStatusLead(Open):
         self.test = test
 
 
-class OpenLeadScoring(Open):
+class ABSOpenLeadScoring(ABSOpen):
     JSON_TEST_OPEN_BASE_DIR = None
 
     def __init__(self, json, test=test):
@@ -263,13 +263,13 @@ class OpenLeadScoring(Open):
         self.test = test
 
 
-class OpenCity(CityBankes, Open):
+class ABSOpenCity(ABSCityBankes, ABSOpen):
     def __init__(self):
-        Open.__init__(self)
-        CityBankes.__init__(self)
+        ABSOpen.__init__(self)
+        ABSCityBankes.__init__(self)
 
 
-class OpenScoring:
+class ABSOpenScoring:
     def __init__(self, json, test=test):
         self.json = json
         self.test = test
@@ -277,14 +277,14 @@ class OpenScoring:
         self.rezult = None
 
     def get_rezult(self):
-        osid = OpenScoringID(self.json, self.test)
+        osid = ABSOpenScoringID(self.json, self.test)
         osid.get_rezult()
         self.rezult = osid.rezult
         self.resend_send = osid.resend_send
         self.args_request = osid.args_request
         if osid.success:
             for i in range(10):
-                osstatus = OpenScoringStatus({'id': f'{osid.rezult}'}, self.test)
+                osstatus = ABSOpenScoringStatus({'id': f'{osid.rezult}'}, self.test)
                 osstatus.get_rezult()
                 self.resend_send = osstatus.resend_send
                 self.args_request = osstatus.args_request
@@ -300,7 +300,7 @@ class OpenScoring:
             return self.rezult
 
 
-class OpenScoringID(OpenLeadScoring):
+class ABSOpenScoringID(ABSOpenLeadScoring):
     endpoint = 'getduplicates'
     endpoint_test = 'getduplicates/test'
 
@@ -322,9 +322,9 @@ class OpenScoringID(OpenLeadScoring):
             return self.response_json['id']
 
 
-class OpenScoringStatus(OpenLeadScoring):
-    endpoint = OpenScoringID.endpoint
-    endpoint_test = OpenScoringID.endpoint_test
+class ABSOpenScoringStatus(ABSOpenLeadScoring):
+    endpoint = ABSOpenScoringID.endpoint
+    endpoint_test = ABSOpenScoringID.endpoint_test
 
     def __init__(self, json, test=test):
         super().__init__(json, test)
@@ -341,7 +341,7 @@ class OpenScoringStatus(OpenLeadScoring):
             return self.response_json['result']['inns']
 
 
-class OpenLead(OpenLeadScoring):
+class ABSOpenLead(ABSOpenLeadScoring):
     endpoint = 'add'
     endpoint_test = 'add/test'
 
@@ -362,7 +362,7 @@ class OpenLead(OpenLeadScoring):
             return self.response_json['id']
 
 
-class ModuleLead(ResponseGarantTestBaseUrl):
+class ABSModuleLead(ResponseGarantTestBaseUrl):
     base_url = 'https://partner.modulbank.ru/public/'
     base_url_test = 'https://partnertest.modulbank.ru/public/'
     endpoint = None
@@ -403,13 +403,13 @@ class ModuleLead(ResponseGarantTestBaseUrl):
                             return dict_response['id']
 
 
-class Tochka(ResponseGarant):
+class ABSTochka(ResponseGarant):
     def __init__(self):
         super().__init__()
         self.url = 'https://open.tochka.com:3000/rest/v1/'
 
 
-class TochkaStatusLead(Tochka):
+class ABSTochkaStatusLead(ABSTochka):
     def __init__(self, json):
         super().__init__()
         self.method = 'post'
@@ -417,7 +417,7 @@ class TochkaStatusLead(Tochka):
         self.url += 'request/statuses'
 
 
-class TochkaLead(Tochka):
+class ABSTochkaLead(ABSTochka):
     def __init__(self, json):
         super().__init__()
         self.method = 'post'
@@ -435,7 +435,7 @@ class TochkaLead(Tochka):
             return self.response_json['data']
 
 
-class TochkaRegistryUr(Tochka):
+class ABSTochkaRegistryUr(ABSTochka):
     def __init__(self, json):
         super().__init__()
         self.method = 'post'
@@ -449,7 +449,7 @@ class TochkaRegistryUr(Tochka):
                 return self.response_json
 
 
-class TochkaAddDocs(Tochka):
+class ABSTochkaAddDocs(ABSTochka):
     def __init__(self, json):
         super().__init__()
         self.method = 'post'
@@ -463,7 +463,7 @@ class TochkaAddDocs(Tochka):
                 return self.response_json
 
 
-class MoeDelo(ResponseGarantTestHeaders):
+class ABSMoeDelo(ResponseGarantTestHeaders):
     headers = {'Content-Type': 'application/json; charset=UTF-8'}
     username = None
     user_key = None
@@ -506,7 +506,7 @@ class MoeDelo(ResponseGarantTestHeaders):
         }
 
 
-class MoeDeloLead(MoeDelo):
+class ABSMoeDeloLead(ABSMoeDelo):
     def __init__(self, json, test=test):
         super().__init__(test)
         self.method = 'post'
@@ -521,7 +521,7 @@ class MoeDeloLead(MoeDelo):
             return self.response_json['RequestId']
 
 
-class PSBall:
+class ABSPSBall:
     def __init__(self):
         self.test = test
         if test is True:
@@ -530,7 +530,7 @@ class PSBall:
             self.url = 'https://api.lk.psbank.ru/fo/v1.0.0'
 
 
-class PSBToken(PSBall, ResponseGarant):
+class ABSPSBToken(ABSPSBall, ResponseGarant):
 
     def do_json(self):
         if 'data' in self.response_json:
@@ -543,7 +543,7 @@ class PSBToken(PSBall, ResponseGarant):
         return self.session.post(f'{self.url}/user/login', data={"email": "andrevo@bk.ru", "password": "0831254Aa."})
 
 
-class PSBParent(ResponseGarantTestBaseUrl):
+class ABSPSBParent(ResponseGarantTestBaseUrl):
     base_url = 'https://api.lk.psbank.ru/fo/v1.0.0'
     base_url_test = 'https://api.lk.finstar.online/fo/v1.0.0'
 
@@ -552,7 +552,7 @@ class PSBParent(ResponseGarantTestBaseUrl):
         self.test = test
 
 
-class PSB(PSBParent):
+class ABSPSB(ABSPSBParent):
     email = None
     password = None
 
@@ -580,13 +580,13 @@ class PSB(PSBParent):
                 return data
 
 
-class PSBCity(PSB, CityBankes):
+class ABSPSBCity(ABSPSB, ABSCityBankes):
     def __init__(self, session):
-        PSB.__init__(self, session)
-        CityBankes.__init__(self)
+        ABSPSB.__init__(self, session)
+        ABSCityBankes.__init__(self)
 
 
-class PSBScoring(PSB):
+class ABSPSBScoring(ABSPSB):
     endpoint = '/orders/check-inn?access-token='
 
     def __init__(self, json_dict, session, test=test):
@@ -610,7 +610,7 @@ class PSBScoring(PSB):
                 return data
 
 
-class PSBLead(PSB):
+class ABSPSBLead(ABSPSB):
     endpoint = '/orders?access-token='
 
     def __init__(self, json, session, test=test):
