@@ -1,11 +1,13 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0",
+            "garant_success_requests>=0.0.7",
+            "requests>=2.28",]
 build-backend = "setuptools.build_meta"
 
 
 [project]
-name = "garant_success_requests"
-version = "0.0.5"
+name = "request_bank_rko"
+version = "0.0.1"
 authors = [
   { name="plp-kolyan", email="plp-kolyan@mail.ru" },
 ]
@@ -20,4 +22,4 @@ classifiers = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/plp-kolyan/CustomRequests.git"
+"Homepage" = "https://github.com/plp-kolyan/requestsbankrko"
