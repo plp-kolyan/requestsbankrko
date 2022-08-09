@@ -250,13 +250,12 @@ class ABSOpenStatusLead(ABSOpen):
 
 
 class ABSOpenLeadScoring(ABSOpen):
-    JSON_TEST_OPEN_BASE_DIR = None
-
-    def __init__(self, json, test=test):
+    def __init__(self, json, json_test_path=None, test=test):
         super().__init__()
         self.json = json
         self.custom_test = True
         self.test = test
+        self.JSON_TEST_OPEN_BASE_DIR = json_test_path
 
 
 class ABSOpenCity(ABSCityBankes, ABSOpen):
@@ -266,6 +265,8 @@ class ABSOpenCity(ABSCityBankes, ABSOpen):
 
 
 class ABSOpenScoring:
+    JSON_TEST_OPEN_BASE_DIR = f'{os.path.abspath(os.curdir)}/'
+
     def __init__(self, json, test=test):
         self.json = json
         self.test = test
@@ -273,14 +274,14 @@ class ABSOpenScoring:
         self.rezult = None
 
     def get_rezult(self):
-        osid = ABSOpenScoringID(self.json, self.test)
+        osid = ABSOpenScoringID(self.json, self.JSON_TEST_OPEN_BASE_DIR, self.test)
         osid.get_rezult()
         self.rezult = osid.rezult
         self.resend_send = osid.resend_send
         self.args_request = osid.args_request
         if osid.success:
             for i in range(10):
-                osstatus = ABSOpenScoringStatus({'id': f'{osid.rezult}'}, self.test)
+                osstatus = ABSOpenScoringStatus({'id': f'{osid.rezult}'}, self.JSON_TEST_OPEN_BASE_DIR, self.test)
                 osstatus.get_rezult()
                 self.resend_send = osstatus.resend_send
                 self.args_request = osstatus.args_request
@@ -300,8 +301,8 @@ class ABSOpenScoringID(ABSOpenLeadScoring):
     endpoint = 'getduplicates'
     endpoint_test = 'getduplicates/test'
 
-    def __init__(self, json, test=test):
-        super().__init__(json, test)
+    def __init__(self, json, json_test_path, test=test):
+        super().__init__(json, json_test_path, test)
         self.method = 'post'
 
     def define_json_response_test(self):
@@ -322,8 +323,8 @@ class ABSOpenScoringStatus(ABSOpenLeadScoring):
     endpoint = ABSOpenScoringID.endpoint
     endpoint_test = ABSOpenScoringID.endpoint_test
 
-    def __init__(self, json, test=test):
-        super().__init__(json, test)
+    def __init__(self, json, json_test_path, test=test):
+        super().__init__(json, json_test_path, test)
         self.method = 'get'
         self.params = self.json
 

@@ -12,6 +12,7 @@ def check_is_exists(response_id, JSON_TEST_OPEN_BASE_DIR):
 
 
 def create_json(response_id: str, inns: list, JSON_TEST_OPEN_BASE_DIR):
+    print(JSON_TEST_OPEN_BASE_DIR)
     if check_is_exists(response_id, JSON_TEST_OPEN_BASE_DIR) is True:
         try:
             open(f'{JSON_TEST_OPEN_BASE_DIR}{response_id}.json', 'a').close()
