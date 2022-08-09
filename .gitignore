@@ -2,3 +2,6 @@
 /.idea
 /.pypirc
 /dist/
+/vtb_api_token.json
+/src/t.py
+/src/vtb_api_token.json

@@ -124,17 +124,11 @@ class ABSVTBBigFather(RequestsGarant):
 
 
 class ABSVTBToken(ABSVTBBigFather):
-    grant_type = None
-    client_id = None
-    client_secret = None
 
-    def __init__(self):
+    def __init__(self, data):
         super().__init__()
-        self.data = {
-            'grant_type': self.grant_type,
-            'client_id': self.client_id,
-            'client_secret': self.client_secret
-        }
+        self.data = data
+        # print(self.data)
         self.url = 'https://passport.api.vtb.ru/passport/oauth2/token'
         self.method = 'post'
 
@@ -145,7 +139,8 @@ class ABSVTBToken(ABSVTBBigFather):
 
 
 class ABSVTBFather(ABSVTBBigFather):
-    path_vtb_token = f'{os.path.dirname(__file__)}/vtb_api_token.json'
+    path_vtb_token = f'{os.path.abspath(os.curdir)}/vtb_api_token.json'
+    data = {}
 
     def __init__(self, json):
         super().__init__()
@@ -159,7 +154,7 @@ class ABSVTBFather(ABSVTBBigFather):
                     return True
 
     def write_vtb_header(self):
-        vtbtoken = ABSVTBToken()
+        vtbtoken = ABSVTBToken(self.credits)
         rezult = vtbtoken.get_rezult()
         if vtbtoken.success is True:
             headers = {'Authorization': f'Bearer {rezult}'}
