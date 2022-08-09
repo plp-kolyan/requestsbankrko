@@ -1,8 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0",
-            "garant_success_requests>=0.0.7",
-            "requests>=2.28",
-			"jsoncustom>=0.0.2"]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 
@@ -21,6 +18,9 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-
+dependencies = ["garant_success_requests>=0.0.7",
+            "requests>=2.28",
+			"jsoncustom>=0.0.2"]
+			
 [project.urls]
 "Homepage" = "https://github.com/plp-kolyan/requestsbankrko"
