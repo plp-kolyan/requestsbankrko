@@ -1,8 +1,9 @@
+import os
 import time
 from datetime import timezone
 from jsoncustom import JsonCustom
-from custom_requests import (ResponseGarant, ResponseGarantTestBaseUrl, ResponseGarantTestEndpoint,
-                             ResponseGarantTestHeaders)
+from requestsgarant import (RequestsGarant, RequestsGarantTestBaseUrl, RequestsGarantTestEndpoint,
+                             RequestsGarantTestHeaders)
 
 inn_freedom = "Свободен"
 inn_busy = "Занят"
@@ -18,7 +19,7 @@ def get_rand_str(total: int):
     return rand_str
 
 
-class ABSAlfa(ResponseGarantTestHeaders):
+class ABSAlfa(RequestsGarantTestHeaders):
     headers = {'Content-Type': 'application/json; charset=UTF-8'}
     dict_key = None
     dict_key_test = None
@@ -116,7 +117,7 @@ class ABSAlfaLead(ABSAlfa):
                             return self.response_json['errors'][0]['detail']
 
 
-class ABSVTBBigFather(ResponseGarant):
+class ABSVTBBigFather(RequestsGarant):
     def __init__(self):
         super().__init__()
         self.url = 'https://epa.api.vtb.ru/openapi/smb/lecs/lead-impers/v1/'
@@ -144,7 +145,7 @@ class ABSVTBToken(ABSVTBBigFather):
 
 
 class ABSVTBFather(ABSVTBBigFather):
-    path_vtb_token = None
+    path_vtb_token = f'{os.path.dirname(__file__)}/vtb_api_token.json'
 
     def __init__(self, json):
         super().__init__()
@@ -231,7 +232,7 @@ class ABSVTBLead(ABSVTBFather):
         self.json_response_test = {"leads": data}
 
 
-class ABSOpen(ResponseGarantTestEndpoint):
+class ABSOpen(RequestsGarantTestEndpoint):
     base_url = 'https://openpartners.ru/api/v2/request/'
 
     def __init__(self):
@@ -362,7 +363,7 @@ class ABSOpenLead(ABSOpenLeadScoring):
             return self.response_json['id']
 
 
-class ABSModuleLead(ResponseGarantTestBaseUrl):
+class ABSModuleLead(RequestsGarantTestBaseUrl):
     base_url = 'https://partner.modulbank.ru/public/'
     base_url_test = 'https://partnertest.modulbank.ru/public/'
     endpoint = None
@@ -403,7 +404,7 @@ class ABSModuleLead(ResponseGarantTestBaseUrl):
                             return dict_response['id']
 
 
-class ABSTochka(ResponseGarant):
+class ABSTochka(RequestsGarant):
     def __init__(self):
         super().__init__()
         self.url = 'https://open.tochka.com:3000/rest/v1/'
@@ -463,7 +464,7 @@ class ABSTochkaAddDocs(ABSTochka):
                 return self.response_json
 
 
-class ABSMoeDelo(ResponseGarantTestHeaders):
+class ABSMoeDelo(RequestsGarantTestHeaders):
     headers = {'Content-Type': 'application/json; charset=UTF-8'}
     username = None
     user_key = None
@@ -530,7 +531,7 @@ class ABSPSBall:
             self.url = 'https://api.lk.psbank.ru/fo/v1.0.0'
 
 
-class ABSPSBToken(ABSPSBall, ResponseGarant):
+class ABSPSBToken(ABSPSBall, RequestsGarant):
 
     def do_json(self):
         if 'data' in self.response_json:
@@ -543,7 +544,7 @@ class ABSPSBToken(ABSPSBall, ResponseGarant):
         return self.session.post(f'{self.url}/user/login', data={"email": "andrevo@bk.ru", "password": "0831254Aa."})
 
 
-class ABSPSBParent(ResponseGarantTestBaseUrl):
+class ABSPSBParent(RequestsGarantTestBaseUrl):
     base_url = 'https://api.lk.psbank.ru/fo/v1.0.0'
     base_url_test = 'https://api.lk.finstar.online/fo/v1.0.0'
 

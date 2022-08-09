@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 
 [project]
-name = "request_bank_rko"
-version = "0.0.2"
+name = "requestsbankrko"
+version = "0.0.3"
 authors = [
   { name="plp-kolyan", email="plp-kolyan@mail.ru" },
 ]
@@ -18,7 +18,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-dependencies = ["garant_success_requests>=0.0.7",
+dependencies = ["requestsgarant>=0.0.7",
             "requests>=2.28",
 			"jsoncustom>=0.0.2"]
 			
