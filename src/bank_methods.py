@@ -2,8 +2,10 @@ import os
 import time
 from datetime import timezone
 from jsoncustom import JsonCustom
-from requestsgarant import (RequestsGarant, RequestsGarantTestBaseUrl, RequestsGarantTestEndpoint,
-                             RequestsGarantTestHeaders)
+from requestsgarant import (
+    RequestsGarant, RequestsGarantTestBaseUrl, RequestsGarantTestEndpoint, RequestsGarantTestHeaders
+)
+
 
 inn_freedom = "Свободен"
 inn_busy = "Занят"
@@ -454,8 +456,13 @@ class TochkaRegistryUr(Tochka):
 class TochkaAddDocs(Tochka):
     def __init__(self, json):
         super().__init__(json)
+        self.json['request']['zip'] = self.make_zip()
         self.method = 'post'
         self.url += 'request/add_files'
+
+    def make_zip(self):
+        from zip_functions import make_zip
+        return make_zip(self.json['request']['zip'])
 
     def do_json(self):
         if isinstance(self.response_json, dict):
