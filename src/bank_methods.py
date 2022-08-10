@@ -303,7 +303,7 @@ class OpenScoringID(OpenLeadScoring):
         self.method = 'post'
 
     def define_json_response_test(self):
-        from .open_methods import create_json
+        from open_methods import create_json
 
         self.json_response_test = {
             'id': f'{get_rand_str(8)}-{get_rand_str(4)}-{get_rand_str(4)}-{get_rand_str(4)}-{get_rand_str(12)}'
@@ -405,24 +405,26 @@ class ModuleLead(Module):
 
 
 class Tochka(RequestsGarant):
-    def __init__(self):
+    token = None
+
+    def __init__(self, json):
         super().__init__()
         self.url = 'https://open.tochka.com:3000/rest/v1/'
+        self.json = json
+        self.json['token'] = self.token
 
 
 class TochkaStatusLead(Tochka):
     def __init__(self, json):
-        super().__init__()
+        super().__init__(json)
         self.method = 'post'
-        self.json = json
         self.url += 'request/statuses'
 
 
 class TochkaLead(Tochka):
     def __init__(self, json):
-        super().__init__()
+        super().__init__(json)
         self.method = 'post'
-        self.json = json
         self.url += 'request/new'
 
     def do_json(self):
@@ -438,9 +440,8 @@ class TochkaLead(Tochka):
 
 class TochkaRegistryUr(Tochka):
     def __init__(self, json):
-        super().__init__()
+        super().__init__(json)
         self.method = 'post'
-        self.json = json
         self.url += 'request/registration'
 
     def do_json(self):
@@ -452,9 +453,8 @@ class TochkaRegistryUr(Tochka):
 
 class TochkaAddDocs(Tochka):
     def __init__(self, json):
-        super().__init__()
+        super().__init__(json)
         self.method = 'post'
-        self.json = json
         self.url += 'request/add_files'
 
     def do_json(self):
