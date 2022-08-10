@@ -356,11 +356,17 @@ class OpenLead(OpenLeadScoring):
             return self.response_json['id']
 
 
-class ModuleLead(RequestsGarantTestBaseUrl):
-    tnx = None
+class Module(RequestsGarantTestBaseUrl):
     base_url = 'https://partner.modulbank.ru/public/'
     base_url_test = 'https://partnertest.modulbank.ru/public/'
-    endpoint = f'agent/app/add?tnx={tnx}'
+    tnx = None
+
+    def __init__(self):
+        super().__init__()
+
+
+class ModuleLead(Module):
+    endpoint = f'agent/app/add?tnx={Module.tnx}'
 
     def __init__(self, json, test=test):
         super().__init__()
