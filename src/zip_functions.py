@@ -18,7 +18,7 @@ def create_path_is_not_exists(path):
 
 def check_path_exists(path, mk='zip'):
     path_to_zip = f'{path}\\{mk}\\'
-    create_path_is_not_exists(path)
+    create_path_is_not_exists(path_to_zip)
     return path_to_zip
 
 

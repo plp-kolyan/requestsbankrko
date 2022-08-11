@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "requestsbankrko"
-version = "0.1.1"
+version = "0.1.3"
 authors = [
   { name="plp-kolyan", email="plp-kolyan@mail.ru" },
 ]
