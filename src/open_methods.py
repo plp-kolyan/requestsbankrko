@@ -1,6 +1,7 @@
 import os
 from random import choice
 from jsoncustom import JsonCustom
+from zip_functions import create_path_is_not_exists
 
 
 def return_listdir_open_json(JSON_TEST_OPEN_BASE_DIR):
@@ -8,6 +9,7 @@ def return_listdir_open_json(JSON_TEST_OPEN_BASE_DIR):
 
 
 def check_is_exists(response_id, JSON_TEST_OPEN_BASE_DIR):
+    create_path_is_not_exists(JSON_TEST_OPEN_BASE_DIR)
     return f'{response_id}.json' not in return_listdir_open_json(JSON_TEST_OPEN_BASE_DIR)
 
 

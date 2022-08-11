@@ -229,7 +229,7 @@ class VTBLead(VTBFather):
 
 class Open(RequestsGarantTestEndpoint):
     base_url = 'https://openpartners.ru/api/v2/request/'
-    JSON_TEST_OPEN_BASE_DIR = f'{os.path.abspath(os.curdir)}/'
+    JSON_TEST_OPEN_BASE_DIR = f'{os.path.abspath(os.curdir)}/jsons/'
     token = None
 
     def __init__(self):
