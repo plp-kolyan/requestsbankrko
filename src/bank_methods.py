@@ -3,11 +3,15 @@ import time
 from datetime import timezone
 from jsoncustom import JsonCustom
 from dotenv import load_dotenv
-load_dotenv()
-
 from requestsgarant import (
     RequestsGarant, RequestsGarantTestBaseUrl, RequestsGarantTestEndpoint, RequestsGarantTestHeaders
 )
+
+
+load_dotenv()
+path_to_env = os.environ.get('path_to_env')
+if path_to_env:
+    load_dotenv(dotenv_path=path_to_env)
 
 
 inn_freedom = "Свободен"
