@@ -31,7 +31,7 @@ def get_rand_str(total: int):
 class Alfa(RequestsGarantTestHeaders):
     headers = {'Content-Type': 'application/json; charset=UTF-8'}
     dict_key = {'API-key': os.environ.get('alfabank_dict_key')}
-    dict_key_test = 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'
+    dict_key_test = {'API-key': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'}
 
     def __init__(self, test=test):
         super().__init__()
