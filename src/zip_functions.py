@@ -11,10 +11,14 @@ def encode_to_base_64(file_path):
         return encoded.decode('utf-8')
 
 
-def check_path_exists(path):
-    path_to_zip = f'{path}\\zip\\'
-    if not os.path.exists(path_to_zip):
-        os.makedirs(path_to_zip)
+def create_path_is_not_exists(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
+def check_path_exists(path, mk='zip'):
+    path_to_zip = f'{path}\\{mk}\\'
+    create_path_is_not_exists(path_to_zip)
     return path_to_zip
 
 

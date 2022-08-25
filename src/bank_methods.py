@@ -2,9 +2,16 @@ import os
 import time
 from datetime import timezone
 from jsoncustom import JsonCustom
+from dotenv import load_dotenv
 from requestsgarant import (
     RequestsGarant, RequestsGarantTestBaseUrl, RequestsGarantTestEndpoint, RequestsGarantTestHeaders
 )
+
+
+load_dotenv()
+path_to_env = os.environ.get('path_to_env')
+if path_to_env:
+    load_dotenv(dotenv_path=path_to_env)
 
 
 inn_freedom = "Свободен"
@@ -23,8 +30,8 @@ def get_rand_str(total: int):
 
 class Alfa(RequestsGarantTestHeaders):
     headers = {'Content-Type': 'application/json; charset=UTF-8'}
-    dict_key = None
-    dict_key_test = None
+    dict_key = {'API-key': os.environ.get('alfabank_dict_key')}
+    dict_key_test = {'API-key': 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'}
 
     def __init__(self, test=test):
         super().__init__()
@@ -33,7 +40,7 @@ class Alfa(RequestsGarantTestHeaders):
 
 
 class CityBankes:
-    cities_path = None
+    cities_path = os.environ.get('cities_path')
 
     def __init__(self):
         self.JC = JsonCustom(f'{self.cities_path}{self.__class__.__name__}.json')
@@ -121,7 +128,11 @@ class AlfaLead(Alfa):
 
 class VTBBigFather(RequestsGarant):
     path_vtb_token = f'{os.path.abspath(os.curdir)}/vtb_api_token.json'
-    credits = None
+    credits = {
+        'grant_type': os.environ.get('vtb_grant_type'),
+        'client_id': os.environ.get('vtb_client_id'),
+        'client_secret': os.environ.get('vtb_client_secret')
+    }
 
     def __init__(self):
         super().__init__()
@@ -230,8 +241,8 @@ class VTBLead(VTBFather):
 
 class Open(RequestsGarantTestEndpoint):
     base_url = 'https://openpartners.ru/api/v2/request/'
-    JSON_TEST_OPEN_BASE_DIR = f'{os.path.abspath(os.curdir)}/'
-    token = None
+    JSON_TEST_OPEN_BASE_DIR = f'{os.path.abspath(os.curdir)}/jsons/'
+    token = os.environ.get('open_token')
 
     def __init__(self):
         super().__init__()
@@ -362,7 +373,7 @@ class OpenLead(OpenLeadScoring):
 class Module(RequestsGarantTestBaseUrl):
     base_url = 'https://partner.modulbank.ru/public/'
     base_url_test = 'https://partnertest.modulbank.ru/public/'
-    tnx = None
+    tnx = os.environ.get('module_tnx')
 
     def __init__(self):
         super().__init__()
@@ -408,7 +419,7 @@ class ModuleLead(Module):
 
 
 class Tochka(RequestsGarant):
-    token = None
+    token = os.environ.get('tochka_token')
 
     def __init__(self, json):
         super().__init__()
@@ -474,8 +485,8 @@ class TochkaAddDocs(Tochka):
 
 class MoeDelo(RequestsGarantTestHeaders):
     headers = {'Content-Type': 'application/json; charset=UTF-8'}
-    username = None
-    user_key = None
+    username = os.environ.get('moedelo_username')
+    user_key = os.environ.get('moedelo_user_key')
 
     def __init__(self, test=test):
         super().__init__()
@@ -540,7 +551,6 @@ class PSBall:
 
 
 class PSBToken(PSBall, RequestsGarant):
-
     def do_json(self):
         if 'data' in self.response_json:
             data = self.response_json['data']
@@ -562,8 +572,8 @@ class PSBParent(RequestsGarantTestBaseUrl):
 
 
 class PSB(PSBParent):
-    email = None
-    password = None
+    email = os.environ.get('psb_email')
+    password = os.environ.get('psb_password')
 
     def __init__(self, session, test=test):
         super().__init__(test)
