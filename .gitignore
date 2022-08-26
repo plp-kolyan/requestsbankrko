@@ -7,4 +7,5 @@
 /src/vtb_api_token.json
 /src/requestsbankrko.egg-info/
 /tests/
+/requestsbankrko.log
 /.env

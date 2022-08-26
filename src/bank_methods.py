@@ -222,7 +222,8 @@ class VTBScoring(VTBFather):
             if 'moreInformation' in self.response_json:
                 if self.response_json['moreInformation'] == 'URL Open error: Could not connect to endpoint' or \
                         self.response_json['moreInformation'] == 'Internal Server Error: ' \
-                                                                 'Assembly reference is required.':
+                                                'Assembly reference is required.' or \
+                                                self.response_json['moreInformation'].find('<BackErr>') != -1:
                     self.resend_send = True
         return do_json_father
 
