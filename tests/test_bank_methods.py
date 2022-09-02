@@ -5,7 +5,13 @@ from unittest import TestCase
 import requests
 from requests.models import Response
 from requestsgarant import return_test_response
-from session_methods import DefineTodaySession, LoadSession
+
+
+try:
+    from session_methods import DefineTodaySession, LoadSession
+except:
+    from .session_methods import DefineTodaySession, LoadSession
+
 
 PATH_TO_VTB_JSON = 'C:\\CustomMethods\\bankes\\VTBtoken_test.json'
 PATH_TO_VTB_CITY_JSON = 'C:\\CustomMethods\\bankes\\cityes\\VTBCity.json'
