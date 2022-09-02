@@ -49,19 +49,19 @@ jobs:
 
       - name: Run tests
         run: |
-        python -m unittest tests.test_bank_methods.AlfaStatusLeadTestCase
-        python -m unittest tests.test_bank_methods.AlfaScoringTestCaset
-        python -m unittest tests.test_bank_methods.AlfaLeadTestCase
-        python -m unittest tests.test_bank_methods.VTBStatusLeadTestCase
-        python -m unittest tests.test_bank_methods.VTBScoringTestCase
-        python -m unittest tests.test_bank_methods.VTBLeadTestCase
-        python -m unittest tests.test_bank_methods.TochkaStatusLeadTestCase
-        python -m unittest tests.test_bank_methods.TochkaLeadTestCase
-        python -m unittest tests.test_bank_methods.TochkaRegistryUrTestCase
-        python -m unittest tests.test_bank_methods.ModuleLeadTestCase
-        python -m unittest tests.test_bank_methods.MoeDeloLeadTestCase
-        python -m unittest tests.test_bank_methods.OpenStatusLeadTestCase
-        python -m unittest tests.test_bank_methods.OpenScoringTestCase
-        python -m unittest tests.test_bank_methods.OpenScoringIDTestCase
-        python -m unittest tests.test_bank_methods.OpenScoringStatusTestCase
-        python -m unittest tests.test_bank_methods.OpenLeadTestCase
+        python -m unittest test_bank_methods.AlfaStatusLeadTestCase
+#        python -m unittest tests.test_bank_methods.AlfaScoringTestCaset
+#        python -m unittest tests.test_bank_methods.AlfaLeadTestCase
+#        python -m unittest tests.test_bank_methods.VTBStatusLeadTestCase
+#        python -m unittest tests.test_bank_methods.VTBScoringTestCase
+#        python -m unittest tests.test_bank_methods.VTBLeadTestCase
+#        python -m unittest tests.test_bank_methods.TochkaStatusLeadTestCase
+#        python -m unittest tests.test_bank_methods.TochkaLeadTestCase
+#        python -m unittest tests.test_bank_methods.TochkaRegistryUrTestCase
+#        python -m unittest tests.test_bank_methods.ModuleLeadTestCase
+#        python -m unittest tests.test_bank_methods.MoeDeloLeadTestCase
+#        python -m unittest tests.test_bank_methods.OpenStatusLeadTestCase
+#        python -m unittest tests.test_bank_methods.OpenScoringTestCase
+#        python -m unittest tests.test_bank_methods.OpenScoringIDTestCase
+#        python -m unittest tests.test_bank_methods.OpenScoringStatusTestCase
+#        python -m unittest tests.test_bank_methods.OpenLeadTestCase
