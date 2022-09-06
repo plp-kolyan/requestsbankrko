@@ -18,10 +18,12 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-dependencies = ["requestsgarant>=0.0.7",
-                "requests>=2.28",
-			    "jsoncustom>=0.0.2",
-			    "python-dotenv>=0.20.0"]
+dependencies = [
+    "requestsgarant>=0.0.7",
+    "requests>=2.28",
+    "jsoncustom>=0.0.2",
+    "python-dotenv>=0.20.0",
+]
 			
 [project.urls]
 "Homepage" = "https://github.com/plp-kolyan/requestsbankrko"

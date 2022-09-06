@@ -8,3 +8,5 @@
 /src/requestsbankrko.egg-info/
 /requestsbankrko.log
 /.env
+src/__pycache__
+tests/__pycache__

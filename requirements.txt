@@ -5,3 +5,4 @@ twine>=4.0.1
 build>=0.8.0
 jsoncustom>=0.0.2
 python-dotenv>=0.20.0
+toml>=0.10.2
