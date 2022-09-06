@@ -169,13 +169,13 @@ class VTBScoringTestCase(TestCase):
             ]
         }
 
-    def test_test(self):
-        obj = VTBScoring(self.json)  #
-        obj.get_rezult()
-        content = b'{"leads":[{"inn":"6679151716","productCode":"Payments","responseCode":"POSITIVE","responseCodeDescription":"\xd0\x9b\xd0\xb8\xd0\xb4 \xd0\xbc\xd0\xbe\xd0\xb6\xd0\xb5\xd1\x82 \xd0\xb1\xd1\x8b\xd1\x82\xd1\x8c \xd0\xb2\xd0\xb7\xd1\x8f\xd1\x82 \xd0\xb2 \xd1\x80\xd0\xb0\xd0\xb1\xd0\xbe\xd1\x82\xd1\x83"},{"inn":"4400008354","productCode":"Payments","responseCode":"POSITIVE","responseCodeDescription":"\xd0\x9b\xd0\xb8\xd0\xb4 \xd0\xbc\xd0\xbe\xd0\xb6\xd0\xb5\xd1\x82 \xd0\xb1\xd1\x8b\xd1\x82\xd1\x8c \xd0\xb2\xd0\xb7\xd1\x8f\xd1\x82 \xd0\xb2 \xd1\x80\xd0\xb0\xd0\xb1\xd0\xbe\xd1\x82\xd1\x83"}]}'
-        cont = content.decode()
-        print(cont)
-        print(json.loads(cont))
+    # def test_test(self):
+    #     obj = VTBScoring(self.json)  #
+    #     obj.get_rezult()
+    #     content = b'{"leads":[{"inn":"6679151716","productCode":"Payments","responseCode":"POSITIVE","responseCodeDescription":"\xd0\x9b\xd0\xb8\xd0\xb4 \xd0\xbc\xd0\xbe\xd0\xb6\xd0\xb5\xd1\x82 \xd0\xb1\xd1\x8b\xd1\x82\xd1\x8c \xd0\xb2\xd0\xb7\xd1\x8f\xd1\x82 \xd0\xb2 \xd1\x80\xd0\xb0\xd0\xb1\xd0\xbe\xd1\x82\xd1\x83"},{"inn":"4400008354","productCode":"Payments","responseCode":"POSITIVE","responseCodeDescription":"\xd0\x9b\xd0\xb8\xd0\xb4 \xd0\xbc\xd0\xbe\xd0\xb6\xd0\xb5\xd1\x82 \xd0\xb1\xd1\x8b\xd1\x82\xd1\x8c \xd0\xb2\xd0\xb7\xd1\x8f\xd1\x82 \xd0\xb2 \xd1\x80\xd0\xb0\xd0\xb1\xd0\xbe\xd1\x82\xd1\x83"}]}'
+    #     cont = content.decode()
+    #     print(cont)
+    #     print(json.loads(cont))
         # j = "{'leads': [{'inn': '4400008354', 'productCode': 'Payments', 'responseCode': 'POSITIVE', 'responseCodeDescription': 'Лид может быть взят в работу'}, {'inn': '6679151716', 'productCode': 'Payments', 'responseCode': 'POSITIVE', 'responseCodeDescription': 'Лид может быть взят в работу'}]}"
         # print()
         # print(json.loads(j))
@@ -287,6 +287,7 @@ class TochkaStatusLeadTestCase(TestCase):
     def test_get_rezult(self):
         test_res = self.obj.get_rezult()
         print(test_res)
+        return True
 
 
 class TochkaLeadTestCase(TestCase):
