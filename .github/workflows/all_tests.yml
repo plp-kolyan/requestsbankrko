@@ -50,8 +50,7 @@ jobs:
       - name: Run tests
         run: |
           python -m unittest tests.test_bank_methods.AlfaStatusLeadTestCase
-#          python -m unittest tests.test_bank_methods.AlfaStatusLeadTestCase
-#          python -m unittest tests.test_bank_methods.AlfaScoringTestCaset
+          python -m unittest tests.test_bank_methods.AlfaScoringTestCaset
 #          python -m unittest tests.test_bank_methods.AlfaLeadTestCase
 #          python -m unittest tests.test_bank_methods.VTBStatusLeadTestCase
 #          python -m unittest tests.test_bank_methods.VTBScoringTestCase
