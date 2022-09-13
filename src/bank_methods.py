@@ -131,7 +131,7 @@ class AlfaLead(Alfa):
 
 
 class VTBBigFather(RequestsGarant):
-    path_vtb_token = f'{os.path.abspath(os.curdir)}/vtb_api_token.json'
+    path_vtb_token = f'{os.path.abspath(os.curdir)}/vtb_api_token.json'.replace('venv\Lib\site-packages/', '')
     credits = {
         'grant_type': os.environ.get('vtb_grant_type'),
         'client_id': os.environ.get('vtb_client_id'),

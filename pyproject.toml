@@ -1,29 +1,21 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = [ "setuptools>=61.0",]
 build-backend = "setuptools.build_meta"
-
 
 [project]
 name = "requestsbankrko"
-version = "0.1.52"
-authors = [
-  { name="plp-kolyan", email="plp-kolyan@mail.ru" },
-]
+version = "0.1.6"
 description = "Гарантированно успешные web-запросы в Банки РКО"
 readme = "README.md"
-license = { file="LICENSE" }
 requires-python = ">=3.7"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-]
-dependencies = [
-    "requestsgarant>=0.0.7",
-    "requests>=2.28",
-    "jsoncustom>=0.0.2",
-    "python-dotenv>=0.20.0",
-]
-			
+classifiers = [ "Programming Language :: Python :: 3", "License :: OSI Approved :: MIT License", "Operating System :: OS Independent",]
+dependencies = [ "requestsgarant>=0.0.7", "requests>=2.28", "jsoncustom>=0.0.2", "python-dotenv>=0.20.0",]
+[[project.authors]]
+name = "plp-kolyan"
+email = "plp-kolyan@mail.ru"
+
+[project.license]
+file = "LICENSE"
+
 [project.urls]
-"Homepage" = "https://github.com/plp-kolyan/requestsbankrko"
+Homepage = "https://github.com/plp-kolyan/requestsbankrko"
