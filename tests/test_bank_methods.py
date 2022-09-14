@@ -1000,3 +1000,6 @@ class RaifazenTestCase(TestCase):
     def test_0(self):
         print(self.obj.get_rezult())
         print(self.obj.response.text)
+
+    def test_init(self):
+        print(self.obj.__dict__)

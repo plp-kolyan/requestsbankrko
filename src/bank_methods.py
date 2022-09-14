@@ -2,18 +2,17 @@ import os
 import time
 from datetime import timezone
 from jsoncustom import JsonCustom
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv, dotenv_values
 from requestsgarant import (
     RequestsGarant, RequestsGarantTestBaseUrl, RequestsGarantTestEndpoint, RequestsGarantTestHeaders
 )
 
 main_env = load_dotenv()
 
-if find_dotenv(".env"):
-    if path_to_env := os.environ.get('PATH_TO_ENV'):
-        load_dotenv(dotenv_path=path_to_env)
+if 'PATH_TO_ENV' in dotenv_values(".env"):
+    load_dotenv(dotenv_path=os.environ.get('PATH_TO_ENV'))
 else:
-    load_dotenv(dotenv_path='C:\config_bank_rko\.env')
+    load_dotenv(dotenv_path='C:\\config_bank_rko\\.env')
 
 inn_freedom = "Свободен"
 inn_busy = "Занят"
