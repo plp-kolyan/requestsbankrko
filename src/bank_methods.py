@@ -553,8 +553,8 @@ class Raifazen(RequestsGarantTestBaseUrl):
     def __init__(self, json, test=test):
         super().__init__()
         self.headers = {
-            'key': '039810d37d59f5d19102d8622c921140',
-            'partnerID': '000052'
+            'key': '',
+            'partnerID': ''
         }
 
         self.method = 'post'
