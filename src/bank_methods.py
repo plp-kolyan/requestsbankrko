@@ -7,16 +7,13 @@ from requestsgarant import (
     RequestsGarant, RequestsGarantTestBaseUrl, RequestsGarantTestEndpoint, RequestsGarantTestHeaders
 )
 
-
 main_env = load_dotenv()
-
 
 if find_dotenv(".env"):
     if path_to_env := os.environ.get('PATH_TO_ENV'):
         load_dotenv(dotenv_path=path_to_env)
 else:
     load_dotenv(dotenv_path='C:\config_bank_rko\.env')
-
 
 inn_freedom = "Свободен"
 inn_busy = "Занят"
@@ -222,8 +219,8 @@ class VTBScoring(VTBFather):
             if 'moreInformation' in self.response_json:
                 if self.response_json['moreInformation'] == 'URL Open error: Could not connect to endpoint' or \
                         self.response_json['moreInformation'] == 'Internal Server Error: ' \
-                                                'Assembly reference is required.' or \
-                                                self.response_json['moreInformation'].find('<BackErr>') != -1:
+                                                                 'Assembly reference is required.' or \
+                        self.response_json['moreInformation'].find('<BackErr>') != -1:
                     self.resend_send = True
         return do_json_father
 
@@ -543,6 +540,26 @@ class MoeDeloLead(MoeDelo):
         if 'RequestId' in self.response_json:
             self.success = True
             return self.response_json['RequestId']
+
+
+def get_url(mod):
+    return f"https://api.raiffeisen.ru/openapi-013-{mod}/corporate-leads-xs/app"
+
+class Raifazen(RequestsGarantTestBaseUrl):
+    endpoint = ''
+    base_url = get_url('opn')
+    base_url_test = get_url('snd')
+
+    def __init__(self, json, test=test):
+        super().__init__()
+        self.headers = {
+            'key': '039810d37d59f5d19102d8622c921140',
+            'partnerID': '000052'
+        }
+
+        self.method = 'post'
+        self.test = test
+        self.json = json
 
 
 class PSBall:

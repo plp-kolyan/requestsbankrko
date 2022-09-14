@@ -965,3 +965,38 @@ class PSBLeadTestCase(TestCase):
 
     def test_get_rezult(self):
         print(self.obj.get_rezult())
+
+
+class RaifazenTestCase(TestCase):
+    def setUp(self):
+
+        self.json = {
+              "meta": {
+                "partnerID": "000052",
+                "businessProduct": "Corporate Account Opening XS",
+                # "refID": "de1c69b5-51de-000c-9ed7-14b0000dd5df"
+              },
+              "data": {
+                "city": "DD8FDE573A964072F998590C212121E0",
+                "companyName": 'ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ "МОМЕНТ"',
+                "inn": '5614087362',
+                "comment": '',
+                "personName": {
+                  "firstName": 'САВЕЛЬЕВ',
+                  "lastName": 'АНАТОЛИЙ',
+                  "middleName": 'КОНСТАНТИНОВИЧ'
+                },
+                "communicationChannels": {
+                  "phone": {
+                    "countryCode": '+7',
+                    "phoneNumber": '9068390072'
+                  }
+                },
+
+              }
+            }
+        self.obj = Raifazen(self.json)
+
+    def test_0(self):
+        print(self.obj.get_rezult())
+        print(self.obj.response.text)
