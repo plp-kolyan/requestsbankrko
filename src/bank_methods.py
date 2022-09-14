@@ -550,12 +550,14 @@ class Raifazen(RequestsGarantTestBaseUrl):
     endpoint = ''
     base_url = get_url('opn')
     base_url_test = get_url('snd')
+    token = os.environ.get('raifazen_token')
+    partner_id = os.environ.get('raifazen_partner_id')
 
     def __init__(self, json, test=test):
         super().__init__()
         self.headers = {
-            'key': os.environ.get('raifazen_token'),
-            'partnerID': os.environ.get('raifazen_partner_id')
+            'key': self.token,
+            'partnerID': self.partner_id
         }
 
         self.method = 'post'
