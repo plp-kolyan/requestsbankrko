@@ -545,6 +545,7 @@ class MoeDeloLead(MoeDelo):
 def get_url(mod):
     return f"https://api.raiffeisen.ru/openapi-013-{mod}/corporate-leads-xs/app"
 
+
 class Raifazen(RequestsGarantTestBaseUrl):
     endpoint = ''
     base_url = get_url('opn')
@@ -553,8 +554,8 @@ class Raifazen(RequestsGarantTestBaseUrl):
     def __init__(self, json, test=test):
         super().__init__()
         self.headers = {
-            'key': '',
-            'partnerID': ''
+            'key': os.environ.get('raifazen_token'),
+            'partnerID': os.environ.get('raifazen_partner_id')
         }
 
         self.method = 'post'
