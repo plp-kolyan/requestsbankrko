@@ -444,6 +444,9 @@ class TochkaLead(Tochka):
     def do_json(self):
         if isinstance(self.response_json, list):
             if self.response_json:
+                if 'Не удалось определить пол' in self.response_json[0]:
+                    self.json['request'].update({'sex': 'M'})
+                    return self.get_rezult()
                 self.success = True
                 return self.response_json[0]
 

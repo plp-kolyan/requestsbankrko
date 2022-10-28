@@ -299,6 +299,7 @@ class TochkaLeadTestCase(TestCase):
                 'name': "ООО 'ВЕЛ-ТОРГ'",
                 'last_name': 'Романов',
                 'first_name': 'Николай',
+                "second_name": "ОТЧЕСТВО",
                 'telephone': f'+79527001328',
                 'comment': '',
                 'address': ''
@@ -311,6 +312,12 @@ class TochkaLeadTestCase(TestCase):
         obj.get_rezult()
         self.assertEqual(obj.success, True)
         self.assertRegex(str(obj.rezult), r'^[0-9]{5}$|^Передан неверный ИНН.$|^Ошибка: заявка с ИНН')
+
+    def test_0(self):
+        obj = TochkaLead(self.json)
+
+        print(obj.get_rezult())
+        print(obj.response_json)
 
 
 class TochkaRegistryUrTestCase(TestCase):
