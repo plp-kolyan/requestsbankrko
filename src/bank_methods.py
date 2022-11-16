@@ -248,6 +248,8 @@ class Open(RequestsGarantTestEndpoint):
         super().__init__()
         self.test = test
         self.headers = {
+            'Host': 'openpartners.ru',
+            'Content-Type': 'multipart/form-data',
             'X-Auth-Token': self.token
         }
 
@@ -484,6 +486,35 @@ class TochkaAddDocs(Tochka):
             if self.response_json:
                 self.success = True
                 return self.response_json
+
+class TochkaLeedRef(RequestsGarant):
+    def __init__(self, json):
+        super().__init__()
+        self.json = json
+
+        self.headers = {
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Content-Length': '2553',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'Host': 'forms.tildacdn.com',
+            'Origin': 'https://partner.tochka.com',
+            'Pragma': 'no-cache',
+            'Referer': 'https://partner.tochka.com/',
+            'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'cross-site',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
+
+        }
+        self.method = 'post'
+        self.url = 'https://forms.tildacdn.com/procces/'
 
 
 class MoeDelo(RequestsGarantTestHeaders):

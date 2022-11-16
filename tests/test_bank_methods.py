@@ -65,11 +65,12 @@ class AlfaScoringTestCaset(TestCase):
         obj.get_response_functions()
         self.assertEqual(obj.args_request['headers']['API-key'], 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa')
 
-    # def test_get_rezult_false(self):
-    #     obj = AlfaScoring(self.json, False)
-    #     obj.get_rezult()
-    #     self.assertEqual(obj.success, True)
-    #     self.assertIn(obj.rezult, ['Свободен', 'Занят'])
+    def test_get_rezult_false(self):
+        obj = AlfaScoring(self.json, False)
+        obj.get_rezult()
+        self.assertEqual(obj.success, True)
+        print(obj.response)
+        self.assertIn(obj.rezult, ['Свободен', 'Занят'])
 
     def test_get_rezult_true(self):
         obj = AlfaScoring(self.json, True)
@@ -319,6 +320,70 @@ class TochkaLeadTestCase(TestCase):
         print(obj.get_rezult())
         print(obj.response_json)
 
+class TestTochkaLeedRef(TestCase):
+    def setUp(self) -> None:
+        '''
+        formservices[]:
+        c1dbed398635e5729a7f32d17aeb88de
+        phone:
+        +7 (994) 333-5632
+        advid:
+        yandex_uid:
+        page_description:
+        Заявку оставили за клиента сотрудники партнёра. Обычное предложение РКО.
+        page_url:
+        inn:
+        454545454545
+        comment:
+        ТЕСТОВАЯ ЗАЯВКА
+        crm_type:
+        signup
+        gclid:
+        form-spec-comments:
+        tildaspec-cookie:
+        tochka_analytics_client_uid=5a437c8c-9b58-d0c6-3303-812b9419a6a1; _gcl_au=1.1.2063294800.1667818077; _ga=GA1.3.1566587440.1667818078; _gid=GA1.3.2034256149.1667818078; tmr_lvid=a8283bfeca8bce5f725136cc83c6a781; tmr_lvidTS=1667818077915; _ym_uid=1667818078419560326; _ym_d=1667818078; _gid=GA1.2.2034256149.1667818078; tildauid=1667818079508.335243; _ga_4R46N8WCLZ=GS1.1.1667966449.7.0.1667966449.60.0.0; _ga=GA1.2.1566587440.1667818078; tildasid=1667966450769.883627; _ym_isad=2; _ym_visorc=w; previousUrl=partner.tochka.com%2Ffp%2F; tmr_detect=0%7C1667966452674; tmr_reqNum=19
+        tildaspec-referer:
+        https://partner.tochka.com/fp/?referer1=kckireev
+        tildaspec-formid:
+        form305838800
+        tildaspec-formskey:
+        8e01b006ad02c72decfea4d870db663d
+        tildaspec-version-lib:
+        02.001
+        tildaspec-pageid:
+        7007880
+        tildaspec-projectid:
+        650828
+        tildaspec-lang:
+        RU
+        tildaspec-fp:
+        6354646d386863386c72752d52552c72752c656e2d55532c656e7057696e333276476f6f676c6520496e632e614d6f7a696c6c616e4e65747363617065706c696e7465726e616c2d7064662d766965776572696e7465726e616c2d7064662d766965776572696e7465726e616c2d7064662d766965776572696e7465726e616c2d7064662d766965776572696e7465726e616c2d7064662d766965776572707231773130373868393639
+        tildaspec-tildacaptcha:
+        03AEkXODADaatSHzMCn18p595NX_J-fO6IDhlBp7jJK33vn1JgZDq0TXe8NwQ5CrI8yO-dpESagHTJQGVGc6HVGewT4PVfj1gsRn6TST14m1-Z7FWRuHnA7zJ2lE-4yMCNxqXP8KzYpOHTCJhJRGtmVAStYR-_kEO92FTkSV78CBr8a6QbF7zd-0BYiXla2g8o93I14uL12uEeHGBby7Dx_FPYEBlbZEet0iNFnflEqh_XrDONbApvixHuvSQ4RuOx7M9NgooGRzfHX11NOmeG6d0yEO3LcPKok1K2AQhYyPpd_T79SajdrtMO5rmcE8KDzHue2_oh4Its5pkoWAGh31iDnfBvt_z5r3-Lso7fTcN-56zdML2rZIughCMTdoq1RhTCpzLZaXfFoB-25rqFMsQnX-JdWlUx3JnzN_4ym_3AhB3ODkGmg-A3Yf_YpnWkN8IBGLiiG_4mz9rjort80BkiVtBRF18dETuJadWBMUMuuR2pLqVKsroHmdDpl4iBd2h2IpEuaibq
+        :return:
+        6324117881
+        '''
+
+        json = {
+                'formservices[]': 'c1dbed398635e5729a7f32d17aeb88de',
+                'advid': 'kckireev',
+                'page_url': 'partner.tochka.com/fp/',
+                'phone': '+7 (927) 571-4003',
+                'page_description': 'Заявку оставили за клиента сотрудники партнёра. Обычное предложение РКО.',
+                'inn': '3000003670',
+                'comment': 'ТЕСТОВАЯ ЗАЯВКА',
+                'tildaspec-referer': 'https://partner.tochka.com/fp/?referer1=kckireev',
+                'tildaspec-formid': 'form305838800',
+                'Referer': 'https://partner.tochka.com/'
+                }
+        self.obj = TochkaLeedRef(json)
+
+    def test_get_rezult(self):
+        print(self.obj.get_rezult())
+        print(self.obj.response_json)
+        print(self.obj.response.request.headers)
+
+
 
 class TochkaRegistryUrTestCase(TestCase):
     def setUp(self) -> None:
@@ -563,7 +628,7 @@ class OpenScoringTestCase(TestCase):
 
     # def test_get_rezult_test_true(self):
     #     obj = OpenScoring(self.json, True)
-    #     obj.get_rezult()
+    #     print(obj.get_rezult())
     #     self.assertEqual(obj.success, True)
     #     self.assertEqual(sorted([dict_client['inn'] for dict_client in obj.rezult]),
     #                      sorted([json for json in self.json['inns']]))
@@ -648,7 +713,10 @@ class OpenScoringStatusTestCase(TestCase):
     def test_get_rezult(self):
         obj = OpenScoringStatus(self.json, True)
         obj.custom_test = False
+
         print(obj.get_rezult())
+        print(obj.args_request)
+        print(obj.response.text)
 
 
 class OpenLeadTestCase(TestCase):
@@ -794,6 +862,8 @@ class VTBtokenTestCase(TestCase):
         self.obj = VTBToken()
 
     def test_get_rezult(self):
+        print(self.obj.path_vtb_token)
+        print(self.obj.credits)
         print(self.obj.get_rezult())
 
 
