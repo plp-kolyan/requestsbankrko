@@ -1,8 +1,8 @@
 name: Build lib
 
-#on:
-#  push:
-#    branches: [ master, development ]
+on:
+  push:
+    branches: [ master ]
 
 env:
   PYTHONIOENCODING: UTF-8
