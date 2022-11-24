@@ -883,6 +883,7 @@ class AlfaCityTestCase(TestCase):
 class VTBtokenTestCase(TestCase):
     def setUp(self):
         self.obj = VTBToken()
+        print(self.obj.cert)
 
     def test_get_rezult(self):
         print(self.obj.path_vtb_token)

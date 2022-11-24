@@ -136,7 +136,7 @@ class VTBBigFather(RequestsGarant):
 
     def __init__(self):
         super().__init__()
-        self.verify = False
+        self.cert = f'{os.path.abspath(os.curdir)}/src/certs.pem'
         self.url = 'https://gw.api.vtb.ru:443/openapi/smb/lecs/lead-impers/v1/'
 
 
