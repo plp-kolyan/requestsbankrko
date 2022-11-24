@@ -186,7 +186,11 @@ class VTBScoringTestCase(TestCase):
 
     def test_get_rezult(self):
         obj = VTBScoring(self.json)
-        obj.get_rezult()
+        print(obj.get_rezult())
+
+        print(obj.response.content)
+
+        print(obj.args_request)
         self.assertEqual(obj.success, True)
         self.assertEqual(sorted([dict_client['inn'] for dict_client in obj.rezult]),
                          sorted([json['inn'] for json in self.json['leads']]))
@@ -216,27 +220,28 @@ class VTBLeadTestCase(TestCase):
         self.json = {
             "leads": [
                 {
-                    "phone": "+7123456789",
+                    "phone": "+79123456789",
                     "consentOnPersonalDataProcessing": True,
                     "inn": "547779835982",
                     "city": "Москва",
                     "productCode": "Payments",
                     "sourceLeadId": "02",
+                    "companyName": "ИП Тест Тестович"
                 },
-                {
-                    "phone": "+7123456789",
-                    "consentOnPersonalDataProcessing": True,
-                    "inn": "547779835982",
-                    "city": "Москва",
-                    "productCode": "Payments",
-                    "sourceLeadId": "01",
-                }
+                # {
+                #     "phone": "+7123456789",
+                #     "consentOnPersonalDataProcessing": True,
+                #     "inn": "547779835982",
+                #     "city": "Москва",
+                #     "productCode": "Payments",
+                #     "sourceLeadId": "01",
+                # }
             ]
         }
 
     def test_get_rezult(self):
         obj = VTBLead(self.json)
-        obj.custom_test = True
+        obj.custom_test = False
         obj.get_rezult()
         print(obj.rezult)
         self.assertEqual(obj.success, True)
@@ -366,15 +371,33 @@ class TestTochkaLeedRef(TestCase):
 
         json = {
                 'formservices[]': 'c1dbed398635e5729a7f32d17aeb88de',
-                'advid': 'kckireev',
-                'page_url': 'partner.tochka.com/fp/',
                 'phone': '+7 (927) 571-4003',
+                'advid': 'kckireev',
                 'page_description': 'Заявку оставили за клиента сотрудники партнёра. Обычное предложение РКО.',
+
+                'yandex_uid': '',
+
+                'page_url': 'partner.tochka.com/fp/',
+
                 'inn': '3000003670',
                 'comment': 'ТЕСТОВАЯ ЗАЯВКА',
+                'crm_type': 'signup',
+                'gclid': '',
+                'form-spec-comments': '',
+                'tildaspec-cookie': 'tochka_analytics_client_uid=5a437c8c-9b58-d0c6-3303-812b9419a6a1; _gcl_au=1.1.2063294800.1667818077; _ga=GA1.3.1566587440.1667818078; tmr_lvid=a8283bfeca8bce5f725136cc83c6a781; tmr_lvidTS=1667818077915; _ym_uid=1667818078419560326; _ym_d=1667818078; tildauid=1667818079508.335243; _gid=GA1.2.1566780950.1668577339; _gid=GA1.3.1566780950.1668577339; tildasid=1668658597858.489091; _ym_visorc=w; _ym_isad=2; _ga_4R46N8WCLZ=GS1.1.1668658601.15.1.1668659581.56.0.0; _ga=GA1.1.1566587440.1667818078; tmr_detect=0%7C1668659582864; previousUrl=partner.tochka.com%2Ffp%2F; tmr_reqNum=80',
                 'tildaspec-referer': 'https://partner.tochka.com/fp/?referer1=kckireev',
+
                 'tildaspec-formid': 'form305838800',
-                'Referer': 'https://partner.tochka.com/'
+                'tildaspec-formskey': '8e01b006ad02c72decfea4d870db663d',
+                'tildaspec-version-lib': '02.001',
+                'tildaspec-pageid': 7007880,
+                'tildaspec-projectid': 650828,
+                'tildaspec-lang': 'RU',
+                'tildaspec-fp': '6354646d386863386c72752d52552c72752c656e2d55532c656e7057696e333276476f6f676c6520496e632e614d6f7a696c6c616e4e65747363617065706c696e7465726e616c2d7064662d766965776572696e7465726e616c2d7064662d766965776572696e7465726e616c2d7064662d766965776572696e7465726e616c2d7064662d766965776572696e7465726e616c2d7064662d7669657765727072317737373468393639',
+                # 'tildaspec-tildacaptcha':'03AEkXODBHDYw9bNPm8gxZ0sMhGNG94t-G8JSH_lM4HHPYqMifTxo8SiQWCoORIcF2iNyZrfUuYV-RhNW6f0t4Th5BgHOZMHTdIJGjY3QMML42jm3xL4VP-4Ygq7qtgIduuElzoU0fl6g5OlPBsFTxa_MoWH1sWlBgupaWgFDa00bhT9a-mw6u40DspOed-xf2FBnnCsSmNIzYxVZ-Bq_uplc6ECspK_AmWRAGrA8dtsgxUKRgjPSU1h3kPgwfOlizAVPvgXFY7CVFMtl-Id_dpnirnY7jEMdGb_zz3_TfJ6iDf91ywBXT_rbdDiMOi3SLneqkwDoj-xG1rQWl2pEwWO3UQ0b0EfKriFqRH2bnTNua6VGfHu7b2WxRrQstzmf1cpiPleSseqwob9abDQWFZpkzq7Ng7P7-YkOJLc-F4Vz5e6ucPQqO9jWIuqcB9RNe07PH-CmkZhWVJNekNBqZWbQzulm-XB4hUX9aZUaBavQN9sPbhYO_-C3FNtQLVn-4_vDnbY822MwXIvMzH61zLDfqYND71exX5Q',
+
+
+
                 }
         self.obj = TochkaLeedRef(json)
 
@@ -864,7 +887,11 @@ class VTBtokenTestCase(TestCase):
     def test_get_rezult(self):
         print(self.obj.path_vtb_token)
         print(self.obj.credits)
+
         print(self.obj.get_rezult())
+        print(self.obj.get_response_functions()())
+
+        print(self.obj.args_request)
 
 
 class OpenTestCase(TestCase):
@@ -1080,3 +1107,56 @@ class RaifazenTestCase(TestCase):
 
     def test_init(self):
         print(self.obj.__dict__)
+
+
+class PSBTokenTestCase(TestCase):
+    def test_0(self):
+        obj = PSBToken(True)
+
+        print(obj.get_rezult())
+
+
+    def test_1(self):
+        # {'code': 404, 'status': 'NOT_EXISTS', 'message': 'Создание заявки с данным ИНН разрешено'}
+        test = True
+
+        obj = PSBToken(test)
+
+        print(obj.get_rezult())
+        if obj.success:
+            inns = ["6382094062", "5007117617", "9705184265", "4705097662", "7734465242", "7813668661", "6320072051", "9719031558", "9723172375", "9704171432", "9725098952", "9725098960", "9725099000", "9725099032", "9703113607", "9727011971", "9726024618", "9704171601", "9728076523", "9727011925", "9727011932", "9728076587", "9701224453", "9701224478", "9728076594", "9727011989", "9729331977", "9725098977", "9705180415", "9726024590", "9727011940", "9727011957", "9728076604", "9729331952", "9727012012", "9725098945", "9726024583", "9728076611", "9718205890", "9703113597", "9727011918", "9706027434", "5009133639", "5262389062", "5032348840", "5029273458", "5075041684", "5018213256", "1684009258", "700006760", "5032348858", "5045069026", "3513003845", "1832165912", "1831207863", "5906175062", "1655489708", "1683010476", "1684009265", "1650418887", "5257212077", "1685008190", "3527024852", "5031148849", "9724109591", "5031148831", "5017130695", "5027311838", "1674003480", "1675001816", "6168118814", "1685008144", "5017130688", "5263150855", "5906175055", "1674003465", "1655489715", "5031148856", "1686020850", "1686020835", "1655489698", "5260487674", "3700000844", "5003154230", "5040182162", "3521007120", "3522004919", "5005072569", "1655489578", "1685008151", "5018213249", "5012108960", "3100009700", "9102286098", "1832165920", "5044137481", "1644101338", "1655489641", "1673003293", "9408000035"]
+            for inn in inns:
+                json = {'inn': inn}
+
+                obj_s = PSBScoring(json, obj.rezult, test)
+
+
+                print(obj_s.get_rezult())
+                print(obj_s.response_json)
+                time.sleep(1)
+
+    def test_2(self):
+        json = {
+            "inn": '9408000035',
+            "name": 'ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ "ВЕЛ-ТОРГ"',
+            "need_s_schet": True,
+            "need_r_schet": True,
+            "fio": 'РОМАНОВ НИКОЛАЙ ВАСИЛЬЕВИЧ',
+            "phone": '79895085349',
+            "email": "yj@mail.ru",
+            "city_id": '1',
+            "comment": ''
+        }
+
+        test = True
+
+        obj = PSBToken(test)
+
+        print(obj.get_rezult())
+        if obj.success:
+            obj_s = PSBLead(json, obj.rezult, test)
+            print(obj_s.get_rezult())
+            # print(obj_s.response_json)
+
+
+

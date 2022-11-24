@@ -136,14 +136,16 @@ class VTBBigFather(RequestsGarant):
 
     def __init__(self):
         super().__init__()
-        self.url = 'https://epa.api.vtb.ru/openapi/smb/lecs/lead-impers/v1/'
+        self.verify = False
+        self.url = 'https://gw.api.vtb.ru:443/openapi/smb/lecs/lead-impers/v1/'
 
 
 class VTBToken(VTBBigFather):
     def __init__(self):
         super().__init__()
         self.data = self.credits
-        self.url = 'https://passport.api.vtb.ru/passport/oauth2/token'
+
+        self.url = 'https://open.api.vtb.ru:443/passport/oauth2/token'
         self.method = 'post'
 
     def do_json(self):
@@ -159,7 +161,8 @@ class VTBFather(VTBBigFather):
         self.json = json
 
     def exist_error_authorization(self):
-        for key, values in (('status', 'needConfirm'), ('httpMessage', 'Unauthorized')):
+        for key, values in (
+        ('reason', 'Unauthorized'), ('errorMessage', 'the header <Authorization> was not received in the request')):
             if key in self.response_json:
                 if self.response_json[key] == values:
                     return True
@@ -168,7 +171,10 @@ class VTBFather(VTBBigFather):
         vtbtoken = VTBToken()
         rezult = vtbtoken.get_rezult()
         if vtbtoken.success is True:
-            headers = {'Authorization': f'Bearer {rezult}'}
+            headers = {
+                'X-IBM-Client-Id': self.credits['client_id'].replace('@ext.vtb.ru', ''),
+                'Authorization': f'Bearer {rezult}'
+            }
             JS = JsonCustom(self.path_vtb_token)
             JS.data = headers
             JS.write()
@@ -248,8 +254,8 @@ class Open(RequestsGarantTestEndpoint):
         super().__init__()
         self.test = test
         self.headers = {
-            'Host': 'openpartners.ru',
-            'Content-Type': 'multipart/form-data',
+            # 'Host': 'openpartners.ru',
+            # 'Content-Type': 'multipart/form-data',
             'X-Auth-Token': self.token
         }
 
@@ -487,10 +493,11 @@ class TochkaAddDocs(Tochka):
                 self.success = True
                 return self.response_json
 
+
 class TochkaLeedRef(RequestsGarant):
     def __init__(self, json):
         super().__init__()
-        self.json = json
+        self.data = json
 
         self.headers = {
             'Accept': 'application/json, text/javascript, */*; q=0.01',
@@ -598,16 +605,37 @@ class Raifazen(RequestsGarantTestBaseUrl):
         self.json = json
 
 
-class PSBall:
-    def __init__(self):
+class PSBall(RequestsGarantTestBaseUrl):
+    base_url = 'https://api.lk.psbank.ru/fo/v1.0.0'
+    # base_url = 'https://api.lk.psb.services/fo/v1.0.0'
+    base_url_test = 'https://api.lk.finstar.online/fo/v1.0.0'
+
+    def __init__(self, test):
+        super().__init__()
+        # self.session = session
         self.test = test
-        if test is True:
-            self.url = 'https://api.lk.finstar.online/fo/v1.0.0'
-        else:
-            self.url = 'https://api.lk.psbank.ru/fo/v1.0.0'
+
+    # def get_response_production(self):
+    #     return self.session.request(**self.args_request)
 
 
-class PSBToken(PSBall, RequestsGarant):
+# class PSBall:
+#     def __init__(self):
+#         self.test = test
+#         if test is True:
+#             self.url = 'https://api.lk.finstar.online/fo/v1.0.0'
+#         else:
+#             self.url = 'https://api.lk.psbank.ru/fo/v1.0.0'
+
+
+class PSBToken(PSBall):
+    def __init__(self, test):
+        super().__init__(test)
+        self.method = 'post'
+        # self.data = {"email": "andrevo@bk.ru", "password": "0831254Aa."}
+        self.data = {"email": os.environ.get('psb_email'), "password": os.environ.get('psb_password')}
+        self.endpoint = '/user/login'
+
     def do_json(self):
         if 'data' in self.response_json:
             data = self.response_json['data']
@@ -615,8 +643,8 @@ class PSBToken(PSBall, RequestsGarant):
                 self.success = True
                 return data['access_token']
 
-    def get_response(self):
-        return self.session.post(f'{self.url}/user/login', data={"email": "andrevo@bk.ru", "password": "0831254Aa."})
+    # def get_response(self):
+    #     return self.session.post(f'{self.url}/user/login', data={"email": "andrevo@bk.ru", "password": "0831254Aa."})
 
 
 class PSBParent(RequestsGarantTestBaseUrl):
@@ -628,78 +656,49 @@ class PSBParent(RequestsGarantTestBaseUrl):
         self.test = test
 
 
-class PSB(PSBParent):
-    email = os.environ.get('psb_email')
-    password = os.environ.get('psb_password')
+class PSBScoring(PSBall):
 
-    def __init__(self, session, test=test):
+
+    def __init__(self, json_dict, token, test=test):
         super().__init__(test)
-        self.session = session
-        self.access_token = self.create_token()
-
-    def create_token(self):
-        for i in range(0, 3):
-            self.access_token = self.get_rezult()
-            if self.success is True:
-                return self.access_token
-
-    def get_response(self):
-        return self.session.post(f'{self.url}/user/login', data={"email": self.email, "password": self.password})
-
-    def receive_condition(self):
-        if 'data' in self.response_json:
-            data = self.response_json['data']
-            if 'access_token' in data:
-                self.success = True
-                return data['access_token']
-            else:
-                return data
-
-
-class PSBCity(PSB, CityBankes):
-    def __init__(self, session):
-        PSB.__init__(self, session)
-        CityBankes.__init__(self)
-
-
-class PSBScoring(PSB):
-    endpoint = '/orders/check-inn?access-token='
-
-    def __init__(self, json_dict, session, test=test):
-        super().__init__(session, test)
         self.json = json_dict
+        self.endpoint = f'/orders/check-inn?access-token={token}'
+        self.method = 'post'
 
-    def get_response_production(self):
-        return self.session.post(
-            url=f'{self.url}{self.access_token}',
-            json=self.json,
-            timeout=5
-        )
 
     def do_json(self):
-        if 'data' in self.response_json:
-            data = self.response_json['data']
-            if 'access_token' in data:
+        if 'status' in self.response_json:
+            if self.response_json['status'] == 'NOT_EXISTS':
                 self.success = True
-                return data['access_token']
-            else:
-                return data
+                return inn_freedom
+            elif self.response_json['status'] == 'ALREADY_EXISTS':
+                self.success = True
+                return inn_busy
+
+            # elif self.response_json['status'] == 429:
+            #     time.sleep(2)
+            #     return self.get_rezult()
 
 
-class PSBLead(PSB):
-    endpoint = '/orders?access-token='
 
-    def __init__(self, json, session, test=test):
-        super().__init__(session, test)
-        self.json = json
+class PSBLead(PSBall):
 
-    def get_response_production(self):
-        return self.session.post(f"{self.url}{self.access_token}", json=self.json)
+
+    def __init__(self, json_dict, token, test=test):
+        super().__init__(test)
+        self.json = json_dict
+        self.endpoint = f'/orders?access-token={token}'
+        self.method = 'post'
 
     def do_json(self):
         if 'data' in self.response_json:
             if 'id' in self.response_json['data']:
                 self.success = True
                 return self.response_json['data']['id']
-            else:
-                return self.response_json
+
+        elif 'errors' in self.response_json:
+            if 'message' in self.response_json['errors']:
+                if self.response_json['errors']['message'] == 'inn: В системе найден дубликат.':
+                    self.success = True
+                    return inn_busy
+
