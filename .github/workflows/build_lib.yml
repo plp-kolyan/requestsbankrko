@@ -14,8 +14,8 @@ jobs:
         os: [ ubuntu-latest ]
         include:
           - os: ubuntu-latest
-              path: ~/.cache/pip
-              venv-path: source venv/bin/activate
+            path: ~/.cache/pip
+            venv-path: source venv/bin/activate
         python-version: [3.9]
 
     runs-on: ${{ matrix.os }}
