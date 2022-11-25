@@ -135,8 +135,11 @@ class VTBBigFather(RequestsGarant):
     }
 
     def __init__(self):
+        import urllib3
+        urllib3.disable_warnings()
         super().__init__()
-        self.cert = f'{os.path.abspath(os.curdir)}/src/certs.pem'
+        # self.cert = f'{os.path.abspath(os.curdir)}/src/certs.pem'
+        self.verify = False
         self.url = 'https://gw.api.vtb.ru:443/openapi/smb/lecs/lead-impers/v1/'
 
 
@@ -615,6 +618,13 @@ class PSBall(RequestsGarantTestBaseUrl):
         # self.session = session
         self.test = test
 
+    def do_json(self):
+        if 'status' in self.response_json:
+            if self.response_json['status'] == 429:
+                time.sleep(3)
+                return self.get_rezult()
+        return self.do_json_wrapper()
+
     # def get_response_production(self):
     #     return self.session.request(**self.args_request)
 
@@ -666,7 +676,7 @@ class PSBScoring(PSBall):
         self.method = 'post'
 
 
-    def do_json(self):
+    def do_json_wrapper(self):
         if 'status' in self.response_json:
             if self.response_json['status'] == 'NOT_EXISTS':
                 self.success = True
@@ -675,9 +685,6 @@ class PSBScoring(PSBall):
                 self.success = True
                 return inn_busy
 
-            # elif self.response_json['status'] == 429:
-            #     time.sleep(2)
-            #     return self.get_rezult()
 
 
 
