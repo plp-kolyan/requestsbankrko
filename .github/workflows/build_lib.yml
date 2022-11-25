@@ -11,11 +11,11 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ windows-latest ]
+        os: [ ubuntu-latest ]
         include:
-          - os: windows-latest
-            path: ~\AppData\Local\pip\Cache
-            venv-path: venv\Scripts\activate.bat
+          - os: ubuntu-latest
+              path: ~/.cache/pip
+              venv-path: source venv/bin/activate
         python-version: [3.9]
 
     runs-on: ${{ matrix.os }}
