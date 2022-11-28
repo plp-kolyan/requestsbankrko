@@ -15,8 +15,8 @@ def start():
     if update_toml() is True:
         os.system('git add .')
         os.system(f'git commit -m "{input("Напиши текст коммита: ")}"')
-        os.system('git branch -M development')
-        os.system('git push -u origin development')
+        os.system('git branch -M raifazen')
+        os.system('git push -u origin raifazen')
 
 
 if __name__ == '__main__':

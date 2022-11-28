@@ -11,8 +11,9 @@ def up_version(version_list, index=None):
         return '.'.join(version_list)
     else:
         last_chr = int(version_list[last_index])
-        if last_chr > 9:
-            version_list[last_index] = str(last_chr // 10)
+        last_chr_10 = last_chr / 10
+        if last_chr_10 > 9.9:
+            version_list[last_index] = str(0)
             last_index -= 1
             return up_version(version_list, last_index)
         return '.'.join(version_list)
