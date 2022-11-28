@@ -187,6 +187,7 @@ class VTBScoringTestCase(TestCase):
     def test_get_rezult(self):
         obj = VTBScoring(self.json)
         print(obj.get_rezult())
+        print(obj.exist_error_authorization())
 
         print(obj.response.content)
 
@@ -1046,6 +1047,24 @@ class PSBScoringTestCase(TestCase):
             self.obj.json = {'inn': 'tyrtyeryrt'}
             print(self.obj.url)
             print(self.obj.get_response().json())
+
+
+class TokenTestCase(TestCase):
+    def setUp(self) -> None:
+        ERROR_AUT_KEY_VAL_CHOICES = (
+        ('reason', 'Unauthorized'), ('errorMessage', 'the header <Authorization> was not received in the request'))
+        self.obj = Aut(VTBToken, ERROR_AUT_KEY_VAL_CHOICES)
+
+    def test_0(self):
+        print(self.obj.__dict__)
+
+    def test_1(self):
+        print(self.obj.get())
+
+    def test_2(self):
+        print(self.obj.write())
+
+
 
 
 class PSBLeadTestCase(TestCase):

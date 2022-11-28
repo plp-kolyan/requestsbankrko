@@ -143,6 +143,49 @@ class VTBBigFather(RequestsGarant):
         self.url = 'https://gw.api.vtb.ru:443/openapi/smb/lecs/lead-impers/v1/'
 
 
+class Aut:
+    def __init__(self, token_cls, ERROR_AUT_KEY_VAL_CHOICES):
+        self.path = f'{os.path.abspath(os.curdir)}/{token_cls.__name__}.txt'.replace('venv\Lib\site-packages/', '')
+        self.token_cls = token_cls
+        self.ERROR_AUT_KEY_VAL_CHOICES = ERROR_AUT_KEY_VAL_CHOICES
+
+    def exist_error_authorization(self):
+        for key, values in self.ERROR_AUT_KEY_VAL_CHOICES:
+            if key in self.response_json:
+                if self.response_json[key] == values:
+                    return True
+
+    def write_token(self):
+        token_obj = self.token_cls()
+        rezult = token_obj.get_rezult()
+        if token_obj.success is True:
+            with open(self.path, 'w') as file:
+                file.write(rezult)
+            return rezult
+
+    def get_token(self):
+        while True:
+            try:
+                with open(self.path, 'r') as file:
+                    return file.read()
+            except:
+                time.sleep(3)
+                self.write_token()
+
+    def do_json(self):
+        if self.exist_error_authorization():
+            if self.write_token() is not None:
+                self.get_rezult()
+                if self.success is True:
+                    return self.rezult
+
+        return self.do_json_success_authorization()
+
+
+
+
+
+
 class VTBToken(VTBBigFather):
     def __init__(self):
         super().__init__()
@@ -157,54 +200,50 @@ class VTBToken(VTBBigFather):
             return self.response_json['access_token']
 
 
-class VTBFather(VTBBigFather):
+
+
+
+class VTBFather(Aut, VTBBigFather):
     def __init__(self, json):
-        super().__init__()
+        VTBBigFather.__init__(self)
+        ERROR_AUT_KEY_VAL_CHOICES = (
+            ('reason', 'Unauthorized'), ('errorMessage', 'the header <Authorization> was not received in the request'))
+        Aut.__init__(self, VTBToken, ERROR_AUT_KEY_VAL_CHOICES)
         self.method = 'post'
         self.json = json
 
-    def exist_error_authorization(self):
-        for key, values in (
-        ('reason', 'Unauthorized'), ('errorMessage', 'the header <Authorization> was not received in the request')):
-            if key in self.response_json:
-                if self.response_json[key] == values:
-                    return True
+    # def exist_error_authorization(self):
+    #     for key, values in (
+    #     ('reason', 'Unauthorized'), ('errorMessage', 'the header <Authorization> was not received in the request')):
+    #         if key in self.response_json:
+    #             if self.response_json[key] == values:
+    #                 return True
 
-    def write_vtb_header(self):
-        vtbtoken = VTBToken()
-        rezult = vtbtoken.get_rezult()
-        if vtbtoken.success is True:
-            headers = {
-                'X-IBM-Client-Id': self.credits['client_id'].replace('@ext.vtb.ru', ''),
-                'Authorization': f'Bearer {rezult}'
-            }
-            JS = JsonCustom(self.path_vtb_token)
-            JS.data = headers
-            JS.write()
-            return headers
+    # def write_vtb_header(self):
+    #     vtbtoken = VTBToken()
+    #     rezult = vtbtoken.get_rezult()
+    #     if vtbtoken.success is True:
+    #         headers = {
+    #             'X-IBM-Client-Id': self.credits['client_id'].replace('@ext.vtb.ru', ''),
+    #             'Authorization': f'Bearer {rezult}'
+    #         }
+    #         JS = JsonCustom(self.path_vtb_token)
+    #         JS.data = headers
+    #         JS.write()
+    #         return headers
 
-    def do_json(self):
-        if self.exist_error_authorization():
-            response_vtb_token = self.write_vtb_header()
-            if response_vtb_token is not None:
-                self.get_rezult()
-                if self.success is True:
-                    return self.rezult
-
+    def do_json_success_authorization(self):
         if 'leads' in self.response_json:
             self.success = True
             return self.response_json['leads']
 
-    def get_header(self):
-        while True:
-            try:
-                return JsonCustom(self.path_vtb_token).reed()
-            except:
-                time.sleep(3)
-                self.write_vtb_header()
+
 
     def get_response_production(self):
-        self.args_request.update({'headers': self.get_header()})
+        self.args_request.update({'headers': {
+                'X-IBM-Client-Id': self.credits['client_id'].replace('@ext.vtb.ru', ''),
+                'Authorization': f'Bearer {self.get_token()}'
+            }})
         return super().get_response_production()
 
 
@@ -221,8 +260,8 @@ class VTBScoring(VTBFather):
         super().__init__(json)
         self.url += 'check_leads'
 
-    def do_json(self):
-        do_json_father = super().do_json()
+    def do_json_success_authorization(self):
+        do_json_father = super().do_json_success_authorization()
         if do_json_father is None:
             if 'moreInformation' in self.response_json:
                 if self.response_json['moreInformation'] == 'URL Open error: Could not connect to endpoint' or \
