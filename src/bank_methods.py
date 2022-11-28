@@ -144,8 +144,9 @@ class VTBBigFather(RequestsGarant):
 
 
 class Aut:
+    args_token_cls = ()
     def __init__(self, token_cls, ERROR_AUT_KEY_VAL_CHOICES):
-        self.path = f'{os.path.abspath(os.curdir)}/{token_cls.__name__}.txt'.replace('venv\Lib\site-packages/', '')
+        self.path_token = f'{os.path.abspath(os.curdir)}/{token_cls.__name__}.txt'.replace('venv\Lib\site-packages/', '')
         self.token_cls = token_cls
         self.ERROR_AUT_KEY_VAL_CHOICES = ERROR_AUT_KEY_VAL_CHOICES
 
@@ -156,17 +157,17 @@ class Aut:
                     return True
 
     def write_token(self):
-        token_obj = self.token_cls()
+        token_obj = self.token_cls(*self.args_token_cls)
         rezult = token_obj.get_rezult()
         if token_obj.success is True:
-            with open(self.path, 'w') as file:
+            with open(self.path_token, 'w') as file:
                 file.write(rezult)
             return rezult
 
     def get_token(self):
         while True:
             try:
-                with open(self.path, 'r') as file:
+                with open(self.path_token, 'r') as file:
                     return file.read()
             except:
                 time.sleep(3)
@@ -653,16 +654,12 @@ class PSBall(RequestsGarantTestBaseUrl):
     base_url_test = 'https://api.lk.finstar.online/fo/v1.0.0'
 
     def __init__(self, test):
+
         super().__init__()
         # self.session = session
         self.test = test
 
-    def do_json(self):
-        if 'status' in self.response_json:
-            if self.response_json['status'] == 429:
-                time.sleep(3)
-                return self.get_rezult()
-        return self.do_json_wrapper()
+
 
     # def get_response_production(self):
     #     return self.session.request(**self.args_request)
@@ -696,22 +693,31 @@ class PSBToken(PSBall):
     #     return self.session.post(f'{self.url}/user/login', data={"email": "andrevo@bk.ru", "password": "0831254Aa."})
 
 
-class PSBParent(RequestsGarantTestBaseUrl):
-    base_url = 'https://api.lk.psbank.ru/fo/v1.0.0'
-    base_url_test = 'https://api.lk.finstar.online/fo/v1.0.0'
+class PSBParent(Aut, PSBall):
 
     def __init__(self, test=test):
-        super().__init__()
-        self.test = test
+        PSBall.__init__(self, test)
+        ERROR_AUT_KEY_VAL_CHOICES = (('name', 'Unauthorized'),)
+        Aut.__init__(self, PSBToken, ERROR_AUT_KEY_VAL_CHOICES)
+        self.args_token_cls = (test,)
 
 
-class PSBScoring(PSBall):
+
+    def do_json_success_authorization(self):
+        if 'status' in self.response_json:
+            if self.response_json['status'] == 429:
+                time.sleep(3)
+                return self.get_rezult()
+        return self.do_json_wrapper()
 
 
-    def __init__(self, json_dict, token, test=test):
+class PSBScoring(PSBParent):
+
+
+    def __init__(self, json_dict, test=test):
         super().__init__(test)
         self.json = json_dict
-        self.endpoint = f'/orders/check-inn?access-token={token}'
+        self.endpoint = f'/orders/check-inn?access-token={self.get_token()}'
         self.method = 'post'
 
 
@@ -728,16 +734,16 @@ class PSBScoring(PSBall):
 
 
 
-class PSBLead(PSBall):
+class PSBLead(PSBParent):
 
 
-    def __init__(self, json_dict, token, test=test):
+    def __init__(self, json_dict, test=test):
         super().__init__(test)
         self.json = json_dict
-        self.endpoint = f'/orders?access-token={token}'
+        self.endpoint = f'/orders?access-token={self.get_token()}'
         self.method = 'post'
 
-    def do_json(self):
+    def do_json_wrapper(self):
         if 'data' in self.response_json:
             if 'id' in self.response_json['data']:
                 self.success = True

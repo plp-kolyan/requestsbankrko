@@ -11,3 +11,5 @@
 src/__pycache__
 tests/__pycache__
 __pycache__ 
+/PSBToken.txt
+/VTBToken.txt
