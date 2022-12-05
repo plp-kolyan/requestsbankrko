@@ -232,6 +232,10 @@ class VTBFather(Aut, VTBBigFather):
     #         JS.data = headers
     #         JS.write()
     #         return headers
+    def do_status_code(self):
+        if self.response_status_code == 404:
+            self.resend_send = True
+        return self.response_status_code
 
     def do_json_success_authorization(self):
         if 'leads' in self.response_json:

@@ -187,7 +187,7 @@ class VTBScoringTestCase(TestCase):
     def test_get_rezult(self):
         obj = VTBScoring(self.json)
         print(obj.get_rezult())
-        print(obj.exist_error_authorization())
+        # print(obj.exist_error_authorization())
 
         print(obj.response.content)
 
