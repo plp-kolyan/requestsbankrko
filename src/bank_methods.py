@@ -665,9 +665,6 @@ class PSBall(RequestsGarantTestBaseUrl):
 
 
 
-    # def get_response_production(self):
-    #     return self.session.request(**self.args_request)
-
 
 # class PSBall:
 #     def __init__(self):
@@ -693,6 +690,10 @@ class PSBToken(PSBall):
                 self.success = True
                 return data['access_token']
 
+    def get_response_production(self):
+        r = super().get_response_production()
+        return r
+
     # def get_response(self):
     #     return self.session.post(f'{self.url}/user/login', data={"email": "andrevo@bk.ru", "password": "0831254Aa."})
 
@@ -714,6 +715,11 @@ class PSBParent(Aut, PSBall):
                 return self.get_rezult()
         return self.do_json_wrapper()
 
+    def get_response_production(self):
+        self.args_request.update({'url': f'{self.url}?access-token={self.get_token()}'})
+        r = super().get_response_production()
+        return r
+
 
 class PSBScoring(PSBParent):
 
@@ -721,7 +727,7 @@ class PSBScoring(PSBParent):
     def __init__(self, json_dict, test=test):
         super().__init__(test)
         self.json = json_dict
-        self.endpoint = f'/orders/check-inn?access-token={self.get_token()}'
+        self.endpoint = f'/orders/check-inn'
         self.method = 'post'
 
 
@@ -744,7 +750,7 @@ class PSBLead(PSBParent):
     def __init__(self, json_dict, test=test):
         super().__init__(test)
         self.json = json_dict
-        self.endpoint = f'/orders?access-token={self.get_token()}'
+        self.endpoint = f'/orders'
         self.method = 'post'
 
     def do_json_wrapper(self):
