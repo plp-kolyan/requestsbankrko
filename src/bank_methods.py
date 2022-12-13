@@ -175,6 +175,7 @@ class Aut:
 
     def do_json(self):
         if self.exist_error_authorization():
+
             if self.write_token() is not None:
                 self.get_rezult()
                 if self.success is True:
@@ -495,6 +496,7 @@ class TochkaLead(Tochka):
         super().__init__(json)
         self.method = 'post'
         self.url += 'request/new'
+        self.double = False
 
     def do_json(self):
         if isinstance(self.response_json, list):
@@ -502,6 +504,9 @@ class TochkaLead(Tochka):
                 if 'Не удалось определить пол' in self.response_json[0]:
                     self.json['request'].update({'sex': 'M'})
                     return self.get_rezult()
+                elif 'Заполненная заявка является дублем' in self.response_json[0]:
+                    self.double = True
+
                 self.success = True
                 return self.response_json[0]
 
@@ -540,6 +545,16 @@ class TochkaAddDocs(Tochka):
                 self.success = True
                 return self.response_json
 
+def get_recaptcha_v2(proxy):
+    from twocaptcha import TwoCaptcha
+
+    solver = TwoCaptcha(os.environ.get('rucaptcha_key'))
+    result = solver.recaptcha(sitekey='6LcZ1zIUAAAAAIdX_hL_-LgO6OXS1nMEM8-E-E8m',
+                              url='https://www.google.com/recaptcha/api2/bframe?hl=en&v=Km9gKuG06He-isPsP6saG8cn&k=6LcZ1zIUAAAAAIdX_hL_-LgO6OXS1nMEM8-E-E8m',
+                              proxy={'type': 'HTTPS', 'uri': proxy}
+                              )
+
+    return result
 
 class TochkaLeedRef(RequestsGarant):
     def __init__(self, json):
@@ -569,6 +584,27 @@ class TochkaLeedRef(RequestsGarant):
         }
         self.method = 'post'
         self.url = 'https://forms.tildacdn.com/procces/'
+        # self.proxy = proxy
+        # self.proxies = {'https': f'http://{self.proxy}/'}
+        self.needcaptcha = False
+
+    def do_json(self):
+        if 'needcaptcha' in self.response_json:
+            self.needcaptcha = True
+        elif 'results' in self.response_json:
+            self.success = True
+            return str(self.response_json['results'])
+
+
+    # def get_rezult(self):
+    #     s = super(TochkaLeedRef, self).get_rezult()
+    #     print(s)
+    #     return s
+
+#         {"needcaptcha":1}
+# 'sitekey' : '6LcZ1zIUAAAAAIdX_hL_-LgO6OXS1nMEM8-E-E8m',
+
+
 
 
 class MoeDelo(RequestsGarantTestHeaders):
@@ -690,9 +726,7 @@ class PSBToken(PSBall):
                 self.success = True
                 return data['access_token']
 
-    def get_response_production(self):
-        r = super().get_response_production()
-        return r
+
 
     # def get_response(self):
     #     return self.session.post(f'{self.url}/user/login', data={"email": "andrevo@bk.ru", "password": "0831254Aa."})
