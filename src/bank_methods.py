@@ -40,16 +40,24 @@ class Alfa(RequestsGarantTestHeaders):
 
 
 class CityBankes:
-    cities_path = os.environ.get('cities_path')
+
+    cities_path_project = 'tests\cityesjson'
+
 
     def __init__(self):
-        self.JC = JsonCustom(f'{self.cities_path}{self.__class__.__name__}.json')
+        self.cities_path = f'{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}\{self.cities_path_project}'
+        self.JC = JsonCustom(f'{self.cities_path}\{self.__class__.__name__}.json')
+
 
     def do_json(self):
         if self.define_valid_json() == True:
             self.JC.data = self.response_json
             self.JC.write()
             return self.JC.data
+
+    def define_valid_json(self):
+        return True
+
 
 
 class AlfaCity(CityBankes, Alfa):
@@ -327,11 +335,13 @@ class OpenLeadScoring(Open):
         self.test = test
 
 
-class OpenCity(CityBankes, Open):
+class OpenCity(CityBankes, RequestsGarant):
     def __init__(self):
-        Open.__init__(self)
+        RequestsGarant.__init__(self)
         CityBankes.__init__(self)
-
+        self.url = Open.base_url.strip('request/') + '/dictionaries/city'
+        self.headers = Open().headers
+        self.method = 'get'
 
 class OpenScoring:
     def __init__(self, json, test=test):

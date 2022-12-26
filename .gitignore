@@ -13,3 +13,4 @@ tests/__pycache__
 __pycache__ 
 /PSBToken.txt
 /VTBToken.txt
+/tests/cityesjson/

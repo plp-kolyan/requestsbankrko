@@ -854,8 +854,10 @@ class CityBankesTestCase(TestCase):
         self.define_valid_json = define_valid_json
 
     def test_init(self):
+
         self.CB = CityBankes()
-        print(self.CB.__dict__)
+        print(self.CB.cities_path)
+        # print(self.CB.__dict__)
 
     def test_do_json(self):
         self.CB = CityBankes()
@@ -941,12 +943,13 @@ class OpenTestCase(TestCase):
 class OpenCityTestCase(TestCase):
     def setUp(self):
         self.OCTC = OpenCity()
-        self.OCTC.test = test
+        # self.OCTC.test = test
 
     def test_init(self):
         print(self.OCTC.__dict__)
 
     def test_do_json(self):
+        self.OCTC.response_json = {}
         print(self.OCTC.do_json())
 
     def test_get_rezult(self):
