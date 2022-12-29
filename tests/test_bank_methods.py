@@ -221,13 +221,13 @@ class VTBLeadTestCase(TestCase):
         self.json = {
             "leads": [
                 {
-                    "phone": "+79123456789",
+                    "phone": "+79525798581",
                     "consentOnPersonalDataProcessing": True,
-                    "inn": "547779835982",
-                    "city": "Москва",
+                    "inn": "6162088338",
+                    "city": "Каменск-Шахтинский",
                     "productCode": "Payments",
-                    "sourceLeadId": "02",
-                    "companyName": "ИП Тест Тестович"
+                    "sourceLeadId": "707463271",
+                    "companyName": 'ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ "АРАКС"'
                 },
                 # {
                 #     "phone": "+7123456789",
@@ -276,6 +276,21 @@ class VTBLeadTestCase(TestCase):
         obj.return_test_response = get_response
         self.assertEqual(obj.get_rezult(), 400)
         self.assertEqual(obj.success, False)
+
+
+    def test_0(self):
+        '''Отправка заявки на настоящий сервер'''
+
+        # [{'responseCode': 'CITY_NOT_AVAILABLE', 'responseCodeDescription': "Ошибка в поле 'city': Выбранный город недоступен для создания заявки. Для уточнения информации обратитесь к своему персональному менеджеру.."}]
+
+        obj = VTBLead(self.json, False)
+        print(obj.get_rezult())
+        print(obj.response_json)
+        print(obj.response.status_code)
+        print(obj.success)
+        print(obj.resend_send)
+
+
 
 
 class TochkaStatusLeadTestCase(TestCase):
