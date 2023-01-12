@@ -247,7 +247,8 @@ class VTBFather(Aut, VTBBigFather):
         return self.response_status_code
 
     def do_json_success_authorization(self):
-        if ('leads' in self.response_json) and (self.response.status_code == 200) :
+        if ('leads' in self.response_json) and ((self.response.status_code == 200)
+                or "Некорректный ИНН." in str(self.response_json)):
             self.success = True
             return self.response_json['leads']
 

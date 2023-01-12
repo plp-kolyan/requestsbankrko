@@ -158,16 +158,7 @@ class VTBStatusLeadTestCase(TestCase):
 class VTBScoringTestCase(TestCase):
     def setUp(self):
         self.json = {
-            "leads": [
-                {
-                    "inn": '4400008354',
-                    "productCode": "Payments",
-                },
-                {
-                    "inn": '6679151716',
-                    "productCode": "Payments",
-                }
-            ]
+            "leads": [{"inn": "9721194775", "productCode": "Payments"}, {"inn": "780448824307", "productCode": "Payments"}, {"inn": "540317272444", "productCode": "Payments"}, {"inn": "661908324831", "productCode": "Payments"}, {"inn": "665800616459", "productCode": "Payments"}, {"inn": "665802770417", "productCode": "Payments"}]
         }
 
     # def test_test(self):
@@ -190,7 +181,7 @@ class VTBScoringTestCase(TestCase):
         # print(obj.exist_error_authorization())
 
         print(obj.response.content)
-
+        print(obj.response.status_code)
         print(obj.args_request)
         self.assertEqual(obj.success, True)
         self.assertEqual(sorted([dict_client['inn'] for dict_client in obj.rezult]),
