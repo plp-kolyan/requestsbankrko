@@ -700,7 +700,8 @@ class Raifazen(RequestsGarantTestBaseUrl):
 
 
 class PSBall(RequestsGarantTestBaseUrl):
-    base_url = 'https://api.lk.psbank.ru/fo/v1.0.0'
+    # base_url = 'https://api.lk.psbank.ru/fo/v1.0.0'
+    base_url = 'https://api.lk.psb.services/fo/v1.0.0'
     # base_url = 'https://api.lk.psb.services/fo/v1.0.0'
     base_url_test = 'https://api.lk.finstar.online/fo/v1.0.0'
 
