@@ -625,7 +625,7 @@ class MoeDelo(RequestsGarantTestHeaders):
 
     def __init__(self, test=test):
         super().__init__()
-        self.custom_test = True
+        self.custom_test = False
         self.test = test
         self.url = 'https://public.moedelo.org/Home/api/Registration/ExternalRegistration/V2'
         self.dict_key = self.genheaders(self.username, self.user_key)
