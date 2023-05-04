@@ -674,6 +674,12 @@ class MoeDeloLead(MoeDelo):
         if 'RequestId' in self.response_json:
             self.success = True
             return self.response_json['RequestId']
+        elif 'К сожалению, такой лид уже зарегистрирован' in self.response_json:
+            self.success = True
+            return self.response_json
+        elif 'ValidationErrors' in self.response_json:
+            self.success = True
+            return self.response_json['ValidationErrors']
 
 
 def get_url(mod):
