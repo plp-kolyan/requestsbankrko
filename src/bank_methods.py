@@ -817,3 +817,28 @@ class PSBLead(PSBParent):
                     self.success = True
                     return inn_busy
 
+class RosBankLead(RequestsGarant):
+    def __init__(self, json):
+        super().__init__()
+        self.url = 'https://api.rosbank.ru/private-person/agent-pro-request/request/index'
+        self.method = 'post'
+        self.json = json
+        self.headers = {
+            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36',
+            'Referer': "https://www.rosbank.ru/",
+            'Accept': 'application/json, text/plain, */*',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7,es;q=0.6,ja;q=0.5',
+            'Content-Type': "application/json;",
+            'Origin': "https://www.rosbank.ru",
+            'Sec-Fetch-Dest': "empty",
+            'Sec-Fetch-Mode': "cors",
+            'Sec-Fetch-Site': "same-site",
+
+        }
+
+    def do_json(self):
+        if 'success' in self.response_json:
+            if 'id' in self.response_json:
+                self.success = True
+                return self.response_json['id']

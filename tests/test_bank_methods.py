@@ -1240,4 +1240,27 @@ class PSBTokenTestCase(TestCase):
         f(*args)
 
 
+class RosBankLeadTestCase(TestCase):
+    def test_test(self):
+        json = {
+            'inn': '7751252660',
+            'contact_comment': 'тест',
+            'contact_name': 'ТЕСТОВА ТЕСТА ТЕСТОВНА',
+            'phone': '+79167819499',
+            'is_registered_inn': True,
+            'is_accept_info': True,
+            'mgm_code': 'K10X5D1',
+            # 'webmaster_id': '',
+            'region_code': '77',
+            'google_id': '777.777',
+        }
+        obj = RosBankLead(json)
+        obj.get_rezult()
+        print(obj.response.request.headers)
+        print(obj.response.text)
+        print(obj.response.content)
+        print(obj.response.json())
+#         {"success":true,"id":2192696}
+
+
 
