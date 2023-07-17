@@ -853,7 +853,7 @@ class Kontur(RequestsGarantTestBaseUrl):
         super().__init__()
         self.test = test
         self.json = json
-        self.headers = {'x-Auth-CustomToken': os.environ.get('kontur_token')}
+        self.headers = {'x-Auth-CustomToken': os.environ.get('kontur_token_test') if test else os.environ.get('kontur_token_prod')}
 
     def do_json(self):
         self.prospective_sale_id = self.response_json.get('ProspectiveSaleId')
