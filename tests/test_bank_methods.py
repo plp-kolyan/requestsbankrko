@@ -1263,4 +1263,128 @@ class RosBankLeadTestCase(TestCase):
 #         {"success":true,"id":2192696}
 
 
+class KonturTestCase(TestCase):
+    def test_0(self):
+        # json = {
+        #     "ProspectiveSaleId": "8d1a3f97-fabd-46b9-972c-eb3c2437a913",
+        #     "Organization": {
+        #         "Inn": "7654776644",
+        #         "IsPhysical": False,
+        #         "Name": "ООО «Боевые Робоединороги»",
+        #         "Region": "66",
+        #         "City": "Екатеринбург",
+        #         "Address": "ул. Малопрудная, д. 5"
+        #     },
+        #     "CountryCode": "RU",
+        #
+        #     "InternalProductId": "Evrika",
+        #     "PartnerCode": "0800",
+        #     "ManagerCode": "08001",
+        #     "Supplier": {
+        #         "PartnerCode": "1000",
+        #         "Inn": "0300797309",
+        #         "Kpp": "030001001"
+        #     },
+        #     "Type": 1,
+        #     "LifeTime": "2023-08-12T10:14:06",
+        #
+        #     "Brief": {
+        #         "Type": "05a05a89-2c0c-4087-a3bf-f45df4af3e79"
+        #     },
+        #     "SpecialScheme": 0,
+        # }
+        json = {
+            # "ProspectiveSaleId": "6c2ee486-eb32-4515-a3aa-0bc40825b39a",
+            "Organization": {
+                "Inn": "7654776644",
+                # "Kpp": "765401001",
+                "IsPhysical": False,
+                "Name": "ООО «Боевые Робоединороги»",
+                "Region": "66",
+                "City": "Екатеринбург",
+                "Address": "ул. Малопрудная, д. 5"
+            },
+            "CountryCode": "RU",
+            "ForeignOrganization": None,
+            "ExternalProductId": None,
+            "InternalProductId": "Evrika",
+            "PartnerCode": "b0000",
+            # "ManagerCode": "08001",
+            # "Supplier": {
+            #     "PartnerCode": "1000",
+            #     "Inn": "0300797309",
+            #     "Kpp": "030001001"
+            # },
+            "Type": 1,
+        }
+        print(KonturCanCreate(json, True).get_rezult())
 
+    def test_2(self):
+        json = {
+            # "ProspectiveSaleId": "7cd28409-4c7c-4b55-af5e-f388a3326124",
+            "Organization": {
+                "Inn": "7654776644",
+                # "Kpp": "765401001",
+                "IsPhysical": False,
+                "Name": "ООО «Боевые Робоединороги»",
+                "Region": "66",
+                "City": "Екатеринбург",
+                "Address": "ул. Малопрудная, д. 5"
+            },
+            "Contacts": [
+                {
+                    "Name": "Кропоткин Василий Павлович",
+                    "Position": "Директор",
+                    "Phones": [
+                        {
+                            "Id": "98da9a79-55f2-46a0-bfa8-a50b8cbce3c4",
+                            "Number": "+75554440011",
+                            "AdditionalNumber": "123"
+                        }
+                    ],
+                    "Emails": [
+                        {
+                            "Address": "ooo@yandex.ru"
+                        }
+                    ]
+                }
+            ],
+            "Source": "www.source.ru",
+            "CountryCode": "RU",
+            "ForeignOrganization": None,
+            "ExternalProductId": None,
+            "InternalProductId": "Evrika",
+            "PartnerCode": "b0000",
+            # "ManagerCode": "08001",
+            # "Supplier": {
+            #     "PartnerCode": "1000",
+            #     "Inn": "0300797309",
+            #     "Kpp": "030001001"
+            # },
+            "Type": 1,
+        }
+
+        # json = {
+        #     'ProspectiveSaleId': 'adf1e209-1308-4713-87a1-18f8c01995ef',
+        #     "Contacts": [
+        #         {
+        #             "Name": "Кропоткин Василий Павлович",
+        #             "Position": "Директор",
+        #             "Phones": [
+        #                 {
+        #                     "Id": "98da9a79-55f2-46a0-bfa8-a50b8cbce3c4",
+        #                     "Number": "+75554440011",
+        #                     "AdditionalNumber": "123"
+        #                 }
+        #             ],
+        #             "Emails": [
+        #                 {
+        #                     "Address": "ooo@yandex.ru"
+        #                 }
+        #             ]
+        #         }
+        #     ],
+        #     "InternalProductId": "Evrika",
+
+        # }
+        print(KonturProspectiveSales(json, True).get_rezult())

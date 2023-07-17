@@ -842,3 +842,49 @@ class RosBankLead(RequestsGarant):
             if 'id' in self.response_json:
                 self.success = True
                 return self.response_json['id']
+
+
+class Kontur(RequestsGarantTestBaseUrl):
+    base_url = 'https://api-crm-billing.kontur.ru'
+    base_url_test = 'https://api-billy-crm.testkontur.ru/'
+
+
+    def __init__(self, json, test):
+        super().__init__()
+        self.test = test
+        self.json = json
+        self.headers = {'x-Auth-CustomToken': os.environ.get('kontur_token')}
+
+    def do_json(self):
+        prospective_sale_id = self.response_json.get('ProspectiveSaleId')
+        if prospective_sale_id is not None:
+            self.success = True
+            return prospective_sale_id
+        results = self.response_json.get('Results')
+        if results is not None:
+            if results:
+                message = results[0].get('Message')
+                if message is not None:
+                    if message in self.invalids:
+                        self.success = True
+                        return inn_busy
+
+
+class KonturCanCreate(Kontur):
+    invalids = ['Есть такая же потенциальная продажа в запрашиваемом PartnerCode']
+    def __init__(self, json, test):
+        super().__init__(json, test)
+        self.endpoint = '/prospectivesales/cancreate/v2'
+        self.method = 'post'
+
+
+
+
+class KonturProspectiveSales(Kontur):
+    invalids = ['Потенциальная продажа с таким Id уже существует']
+    def __init__(self, json, test):
+        super().__init__(json, test)
+        self.endpoint = '/prospectivesales/create/v4'
+        self.method = 'post'
+
+
