@@ -856,10 +856,10 @@ class Kontur(RequestsGarantTestBaseUrl):
         self.headers = {'x-Auth-CustomToken': os.environ.get('kontur_token')}
 
     def do_json(self):
-        prospective_sale_id = self.response_json.get('ProspectiveSaleId')
-        if prospective_sale_id is not None:
+        self.prospective_sale_id = self.response_json.get('ProspectiveSaleId')
+        if self.prospective_sale_id is not None:
             self.success = True
-            return prospective_sale_id
+            return self.suc_resp()
         results = self.response_json.get('Results')
         if results is not None:
             if results:
@@ -878,6 +878,13 @@ class KonturCanCreate(Kontur):
         self.method = 'post'
 
 
+    def suc_resp(self):
+        return inn_freedom
+
+
+
+
+
 
 
 class KonturProspectiveSales(Kontur):
@@ -886,5 +893,9 @@ class KonturProspectiveSales(Kontur):
         super().__init__(json, test)
         self.endpoint = '/prospectivesales/create/v4'
         self.method = 'post'
+
+
+    def suc_resp(self):
+        return self.prospective_sale_id
 
 
