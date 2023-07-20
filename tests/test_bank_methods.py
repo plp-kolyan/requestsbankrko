@@ -1327,7 +1327,7 @@ class KonturTestCase(TestCase):
                 # "Kpp": "765401001",
                 "IsPhysical": False,
                 "Name": "ООО «Боевые Робоединороги»",
-                "Region": "66",
+                # "Region": "66",
                 "City": "Екатеринбург",
                 "Address": "ул. Малопрудная, д. 5"
             },
@@ -1342,11 +1342,11 @@ class KonturTestCase(TestCase):
                             "AdditionalNumber": "123"
                         }
                     ],
-                    "Emails": [
-                        {
-                            "Address": "ooo@yandex.ru"
-                        }
-                    ]
+                    # "Emails": [
+                    #     {
+                    #         "Address": "ooo@yandex.ru"
+                    #     }
+                    # ]
                 }
             ],
             "Source": "www.source.ru",

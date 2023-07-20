@@ -871,7 +871,10 @@ class Kontur(RequestsGarantTestBaseUrl):
 
 
 class KonturCanCreate(Kontur):
-    invalids = ['Есть такая же потенциальная продажа в запрашиваемом PartnerCode']
+    invalids = [
+        'Есть такая же потенциальная продажа в запрашиваемом PartnerCode',
+        'Есть такая же потенциальная продажа в другом PartnerCode'
+    ]
     def __init__(self, json, test):
         super().__init__(json, test)
         self.endpoint = '/prospectivesales/cancreate/v2'
