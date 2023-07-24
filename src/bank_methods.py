@@ -2,21 +2,17 @@ import os
 import time
 from datetime import timezone
 from jsoncustom import JsonCustom
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv, dotenv_values
 from requestsgarant import (
     RequestsGarant, RequestsGarantTestBaseUrl, RequestsGarantTestEndpoint, RequestsGarantTestHeaders
 )
 
-
 main_env = load_dotenv()
 
-
-if find_dotenv(".env"):
-    if path_to_env := os.environ.get('PATH_TO_ENV'):
-        load_dotenv(dotenv_path=path_to_env)
+if 'PATH_TO_ENV' in dotenv_values(".env"):
+    load_dotenv(dotenv_path=os.environ.get('PATH_TO_ENV'))
 else:
-    load_dotenv(dotenv_path='C:\config_bank_rko\.env')
-
+    load_dotenv(dotenv_path='C:\\config_bank_rko\\.env')
 
 inn_freedom = "Свободен"
 inn_busy = "Занят"
@@ -44,16 +40,24 @@ class Alfa(RequestsGarantTestHeaders):
 
 
 class CityBankes:
-    cities_path = os.environ.get('cities_path')
+
+    cities_path_project = 'tests\cityesjson'
+
 
     def __init__(self):
-        self.JC = JsonCustom(f'{self.cities_path}{self.__class__.__name__}.json')
+        self.cities_path = f'{os.path.dirname(os.path.dirname(os.path.abspath(__file__)))}\{self.cities_path_project}'
+        self.JC = JsonCustom(f'{self.cities_path}\{self.__class__.__name__}.json')
+
 
     def do_json(self):
         if self.define_valid_json() == True:
             self.JC.data = self.response_json
             self.JC.write()
             return self.JC.data
+
+    def define_valid_json(self):
+        return True
+
 
 
 class AlfaCity(CityBankes, Alfa):
@@ -139,15 +143,65 @@ class VTBBigFather(RequestsGarant):
     }
 
     def __init__(self):
+        import urllib3
+        urllib3.disable_warnings()
         super().__init__()
-        self.url = 'https://epa.api.vtb.ru/openapi/smb/lecs/lead-impers/v1/'
+        # self.cert = f'{os.path.abspath(os.curdir)}/src/certs.pem'
+        self.verify = False
+        self.url = 'https://gw.api.vtb.ru:443/openapi/smb/lecs/lead-impers/v1/'
+
+
+class Aut:
+    args_token_cls = ()
+    def __init__(self, token_cls, ERROR_AUT_KEY_VAL_CHOICES):
+        self.path_token = f'{os.path.abspath(os.curdir)}/{token_cls.__name__}.txt'.replace('venv\Lib\site-packages/', '')
+        self.token_cls = token_cls
+        self.ERROR_AUT_KEY_VAL_CHOICES = ERROR_AUT_KEY_VAL_CHOICES
+
+    def exist_error_authorization(self):
+        for key, values in self.ERROR_AUT_KEY_VAL_CHOICES:
+            if key in self.response_json:
+                if self.response_json[key] == values:
+                    return True
+
+    def write_token(self):
+        token_obj = self.token_cls(*self.args_token_cls)
+        rezult = token_obj.get_rezult()
+        if token_obj.success is True:
+            with open(self.path_token, 'w') as file:
+                file.write(rezult)
+            return rezult
+
+    def get_token(self):
+        while True:
+            try:
+                with open(self.path_token, 'r') as file:
+                    return file.read()
+            except:
+                time.sleep(3)
+                self.write_token()
+
+    def do_json(self):
+        if self.exist_error_authorization():
+
+            if self.write_token() is not None:
+                self.get_rezult()
+                if self.success is True:
+                    return self.rezult
+
+        return self.do_json_success_authorization()
+
+
+
+
 
 
 class VTBToken(VTBBigFather):
     def __init__(self):
         super().__init__()
         self.data = self.credits
-        self.url = 'https://passport.api.vtb.ru/passport/oauth2/token'
+
+        self.url = 'https://open.api.vtb.ru:443/passport/oauth2/token'
         self.method = 'post'
 
     def do_json(self):
@@ -156,50 +210,55 @@ class VTBToken(VTBBigFather):
             return self.response_json['access_token']
 
 
-class VTBFather(VTBBigFather):
+
+
+
+class VTBFather(Aut, VTBBigFather):
     def __init__(self, json):
-        super().__init__()
+        VTBBigFather.__init__(self)
+        ERROR_AUT_KEY_VAL_CHOICES = (
+            ('reason', 'Unauthorized'), ('errorMessage', 'the header <Authorization> was not received in the request'))
+        Aut.__init__(self, VTBToken, ERROR_AUT_KEY_VAL_CHOICES)
         self.method = 'post'
         self.json = json
 
-    def exist_error_authorization(self):
-        for key, values in (('status', 'needConfirm'), ('httpMessage', 'Unauthorized')):
-            if key in self.response_json:
-                if self.response_json[key] == values:
-                    return True
+    # def exist_error_authorization(self):
+    #     for key, values in (
+    #     ('reason', 'Unauthorized'), ('errorMessage', 'the header <Authorization> was not received in the request')):
+    #         if key in self.response_json:
+    #             if self.response_json[key] == values:
+    #                 return True
 
-    def write_vtb_header(self):
-        vtbtoken = VTBToken()
-        rezult = vtbtoken.get_rezult()
-        if vtbtoken.success is True:
-            headers = {'Authorization': f'Bearer {rezult}'}
-            JS = JsonCustom(self.path_vtb_token)
-            JS.data = headers
-            JS.write()
-            return headers
+    # def write_vtb_header(self):
+    #     vtbtoken = VTBToken()
+    #     rezult = vtbtoken.get_rezult()
+    #     if vtbtoken.success is True:
+    #         headers = {
+    #             'X-IBM-Client-Id': self.credits['client_id'].replace('@ext.vtb.ru', ''),
+    #             'Authorization': f'Bearer {rezult}'
+    #         }
+    #         JS = JsonCustom(self.path_vtb_token)
+    #         JS.data = headers
+    #         JS.write()
+    #         return headers
+    def do_status_code(self):
+        if self.response_status_code == 404:
+            self.resend_send = True
+        return self.response_status_code
 
-    def do_json(self):
-        if self.exist_error_authorization():
-            response_vtb_token = self.write_vtb_header()
-            if response_vtb_token is not None:
-                self.get_rezult()
-                if self.success is True:
-                    return self.rezult
-
-        if 'leads' in self.response_json:
+    def do_json_success_authorization(self):
+        if ('leads' in self.response_json) and ((self.response.status_code == 200)
+                or "Некорректный ИНН." in str(self.response_json)):
             self.success = True
             return self.response_json['leads']
 
-    def get_header(self):
-        while True:
-            try:
-                return JsonCustom(self.path_vtb_token).reed()
-            except:
-                time.sleep(3)
-                self.write_vtb_header()
+
 
     def get_response_production(self):
-        self.args_request.update({'headers': self.get_header()})
+        self.args_request.update({'headers': {
+                'X-IBM-Client-Id': self.credits['client_id'].replace('@ext.vtb.ru', ''),
+                'Authorization': f'Bearer {self.get_token()}'
+            }})
         return super().get_response_production()
 
 
@@ -216,14 +275,14 @@ class VTBScoring(VTBFather):
         super().__init__(json)
         self.url += 'check_leads'
 
-    def do_json(self):
-        do_json_father = super().do_json()
+    def do_json_success_authorization(self):
+        do_json_father = super().do_json_success_authorization()
         if do_json_father is None:
             if 'moreInformation' in self.response_json:
                 if self.response_json['moreInformation'] == 'URL Open error: Could not connect to endpoint' or \
                         self.response_json['moreInformation'] == 'Internal Server Error: ' \
-                                                'Assembly reference is required.' or \
-                                                self.response_json['moreInformation'].find('<BackErr>') != -1:
+                                                                 'Assembly reference is required.' or \
+                        self.response_json['moreInformation'].find('<BackErr>') != -1:
                     self.resend_send = True
         return do_json_father
 
@@ -252,6 +311,8 @@ class Open(RequestsGarantTestEndpoint):
         super().__init__()
         self.test = test
         self.headers = {
+            # 'Host': 'openpartners.ru',
+            # 'Content-Type': 'multipart/form-data',
             'X-Auth-Token': self.token
         }
 
@@ -275,11 +336,13 @@ class OpenLeadScoring(Open):
         self.test = test
 
 
-class OpenCity(CityBankes, Open):
+class OpenCity(CityBankes, RequestsGarant):
     def __init__(self):
-        Open.__init__(self)
+        RequestsGarant.__init__(self)
         CityBankes.__init__(self)
-
+        self.url = Open.base_url.strip('request/') + '/dictionaries/city'
+        self.headers = Open().headers
+        self.method = 'get'
 
 class OpenScoring:
     def __init__(self, json, test=test):
@@ -444,10 +507,17 @@ class TochkaLead(Tochka):
         super().__init__(json)
         self.method = 'post'
         self.url += 'request/new'
+        self.double = False
 
     def do_json(self):
         if isinstance(self.response_json, list):
             if self.response_json:
+                if 'Не удалось определить пол' in self.response_json[0]:
+                    self.json['request'].update({'sex': 'M'})
+                    return self.get_rezult()
+                elif 'Заполненная заявка является дублем' in self.response_json[0]:
+                    self.double = True
+
                 self.success = True
                 return self.response_json[0]
 
@@ -486,6 +556,67 @@ class TochkaAddDocs(Tochka):
                 self.success = True
                 return self.response_json
 
+def get_recaptcha_v2(proxy):
+    from twocaptcha import TwoCaptcha
+
+    solver = TwoCaptcha(os.environ.get('rucaptcha_key'))
+    result = solver.recaptcha(sitekey='6LcZ1zIUAAAAAIdX_hL_-LgO6OXS1nMEM8-E-E8m',
+                              url='https://www.google.com/recaptcha/api2/bframe?hl=en&v=Km9gKuG06He-isPsP6saG8cn&k=6LcZ1zIUAAAAAIdX_hL_-LgO6OXS1nMEM8-E-E8m',
+                              proxy={'type': 'HTTPS', 'uri': proxy}
+                              )
+
+    return result
+
+class TochkaLeedRef(RequestsGarant):
+    def __init__(self, json):
+        super().__init__()
+        self.data = json
+
+        self.headers = {
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Content-Length': '2553',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'Host': 'forms.tildacdn.com',
+            'Origin': 'https://partner.tochka.com',
+            'Pragma': 'no-cache',
+            'Referer': 'https://partner.tochka.com/',
+            'sec-ch-ua': '"Google Chrome";v="107", "Chromium";v="107", "Not=A?Brand";v="24"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'cross-site',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
+
+        }
+        self.method = 'post'
+        self.url = 'https://forms.tildacdn.com/procces/'
+        # self.proxy = proxy
+        # self.proxies = {'https': f'http://{self.proxy}/'}
+        self.needcaptcha = False
+
+    def do_json(self):
+        if 'needcaptcha' in self.response_json:
+            self.needcaptcha = True
+        elif 'results' in self.response_json:
+            self.success = True
+            return str(self.response_json['results'])
+
+
+    # def get_rezult(self):
+    #     s = super(TochkaLeedRef, self).get_rezult()
+    #     print(s)
+    #     return s
+
+#         {"needcaptcha":1}
+# 'sitekey' : '6LcZ1zIUAAAAAIdX_hL_-LgO6OXS1nMEM8-E-E8m',
+
+
+
 
 class MoeDelo(RequestsGarantTestHeaders):
     headers = {'Content-Type': 'application/json; charset=UTF-8'}
@@ -494,7 +625,7 @@ class MoeDelo(RequestsGarantTestHeaders):
 
     def __init__(self, test=test):
         super().__init__()
-        self.custom_test = True
+        self.custom_test = False
         self.test = test
         self.url = 'https://public.moedelo.org/Home/api/Registration/ExternalRegistration/V2'
         self.dict_key = self.genheaders(self.username, self.user_key)
@@ -543,110 +674,231 @@ class MoeDeloLead(MoeDelo):
         if 'RequestId' in self.response_json:
             self.success = True
             return self.response_json['RequestId']
+        elif 'К сожалению, такой лид уже зарегистрирован' in self.response_json:
+            self.success = True
+            return self.response_json
+        elif 'ValidationErrors' in self.response_json:
+            self.success = True
+            return self.response_json['ValidationErrors']
 
 
-class PSBall:
-    def __init__(self):
-        self.test = test
-        if test is True:
-            self.url = 'https://api.lk.finstar.online/fo/v1.0.0'
-        else:
-            self.url = 'https://api.lk.psbank.ru/fo/v1.0.0'
+def get_url(mod):
+    return f"https://api.raiffeisen.ru/openapi-013-{mod}/corporate-leads-xs/app"
 
 
-class PSBToken(PSBall, RequestsGarant):
-    def do_json(self):
-        if 'data' in self.response_json:
-            data = self.response_json['data']
-            if 'access_token' in data:
-                self.success = True
-                return data['access_token']
+class Raifazen(RequestsGarantTestBaseUrl):
+    endpoint = ''
+    base_url = get_url('opn')
+    base_url_test = get_url('snd')
+    token = os.environ.get('raifazen_token')
+    partner_id = os.environ.get('raifazen_partner_id')
 
-    def get_response(self):
-        return self.session.post(f'{self.url}/user/login', data={"email": "andrevo@bk.ru", "password": "0831254Aa."})
-
-
-class PSBParent(RequestsGarantTestBaseUrl):
-    base_url = 'https://api.lk.psbank.ru/fo/v1.0.0'
-    base_url_test = 'https://api.lk.finstar.online/fo/v1.0.0'
-
-    def __init__(self, test=test):
+    def __init__(self, json, test=test):
         super().__init__()
+        self.headers = {
+            'key': self.token,
+            'partnerID': self.partner_id
+        }
+
+        self.method = 'post'
         self.test = test
-
-
-class PSB(PSBParent):
-    email = os.environ.get('psb_email')
-    password = os.environ.get('psb_password')
-
-    def __init__(self, session, test=test):
-        super().__init__(test)
-        self.session = session
-        self.access_token = self.create_token()
-
-    def create_token(self):
-        for i in range(0, 3):
-            self.access_token = self.get_rezult()
-            if self.success is True:
-                return self.access_token
-
-    def get_response(self):
-        return self.session.post(f'{self.url}/user/login', data={"email": self.email, "password": self.password})
-
-    def receive_condition(self):
-        if 'data' in self.response_json:
-            data = self.response_json['data']
-            if 'access_token' in data:
-                self.success = True
-                return data['access_token']
-            else:
-                return data
-
-
-class PSBCity(PSB, CityBankes):
-    def __init__(self, session):
-        PSB.__init__(self, session)
-        CityBankes.__init__(self)
-
-
-class PSBScoring(PSB):
-    endpoint = '/orders/check-inn?access-token='
-
-    def __init__(self, json_dict, session, test=test):
-        super().__init__(session, test)
-        self.json = json_dict
-
-    def get_response_production(self):
-        return self.session.post(
-            url=f'{self.url}{self.access_token}',
-            json=self.json,
-            timeout=5
-        )
-
-    def do_json(self):
-        if 'data' in self.response_json:
-            data = self.response_json['data']
-            if 'access_token' in data:
-                self.success = True
-                return data['access_token']
-            else:
-                return data
-
-
-class PSBLead(PSB):
-    endpoint = '/orders?access-token='
-
-    def __init__(self, json, session, test=test):
-        super().__init__(session, test)
         self.json = json
 
-    def get_response_production(self):
-        return self.session.post(f"{self.url}{self.access_token}", json=self.json)
+
+class PSBall(RequestsGarantTestBaseUrl):
+    # base_url = 'https://api.lk.psbank.ru/fo/v1.0.0'
+    base_url = 'https://api.lk.psb.services/fo/v1.0.0'
+    # base_url = 'https://api.lk.psb.services/fo/v1.0.0'
+    base_url_test = 'https://api.lk.finstar.online/fo/v1.0.0'
+
+    def __init__(self, test):
+
+        super().__init__()
+        # self.session = session
+        self.test = test
+
+
+
+
+# class PSBall:
+#     def __init__(self):
+#         self.test = test
+#         if test is True:
+#             self.url = 'https://api.lk.finstar.online/fo/v1.0.0'
+#         else:
+#             self.url = 'https://api.lk.psbank.ru/fo/v1.0.0'
+
+
+class PSBToken(PSBall):
+    def __init__(self, test):
+        super().__init__(test)
+        self.method = 'post'
+        # self.data = {"email": "andrevo@bk.ru", "password": "0831254Aa."}
+        self.data = {"email": os.environ.get('psb_email'), "password": os.environ.get('psb_password')}
+        self.endpoint = '/user/login'
 
     def do_json(self):
+        if 'data' in self.response_json:
+            data = self.response_json['data']
+            if 'access_token' in data:
+                self.success = True
+                return data['access_token']
+
+
+
+    # def get_response(self):
+    #     return self.session.post(f'{self.url}/user/login', data={"email": "andrevo@bk.ru", "password": "0831254Aa."})
+
+
+class PSBParent(Aut, PSBall):
+
+    def __init__(self, test=test):
+        PSBall.__init__(self, test)
+        ERROR_AUT_KEY_VAL_CHOICES = (('name', 'Unauthorized'),)
+        Aut.__init__(self, PSBToken, ERROR_AUT_KEY_VAL_CHOICES)
+        self.args_token_cls = (test,)
+
+
+
+    def do_json_success_authorization(self):
+        if 'status' in self.response_json:
+            if self.response_json['status'] == 429:
+                time.sleep(3)
+                return self.get_rezult()
+        return self.do_json_wrapper()
+
+    def get_response_production(self):
+        self.args_request.update({'url': f'{self.url}?access-token={self.get_token()}'})
+        r = super().get_response_production()
+        return r
+
+
+class PSBScoring(PSBParent):
+
+
+    def __init__(self, json_dict, test=test):
+        super().__init__(test)
+        self.json = json_dict
+        self.endpoint = f'/orders/check-inn'
+        self.method = 'post'
+
+
+    def do_json_wrapper(self):
+        if 'status' in self.response_json:
+            if self.response_json['status'] == 'NOT_EXISTS':
+                self.success = True
+                return inn_freedom
+            elif self.response_json['status'] == 'ALREADY_EXISTS':
+                self.success = True
+                return inn_busy
+
+
+
+
+
+class PSBLead(PSBParent):
+
+
+    def __init__(self, json_dict, test=test):
+        super().__init__(test)
+        self.json = json_dict
+        self.endpoint = f'/orders'
+        self.method = 'post'
+
+    def do_json_wrapper(self):
         if 'data' in self.response_json:
             if 'id' in self.response_json['data']:
                 self.success = True
                 return self.response_json['data']['id']
-            else:
-                return self.response_json
+
+        elif 'errors' in self.response_json:
+            if 'message' in self.response_json['errors']:
+                if self.response_json['errors']['message'] == 'inn: В системе найден дубликат.':
+                    self.success = True
+                    return inn_busy
+
+class RosBankLead(RequestsGarant):
+    def __init__(self, json):
+        super().__init__()
+        self.url = 'https://api.rosbank.ru/private-person/agent-pro-request/request/index'
+        self.method = 'post'
+        self.json = json
+        self.headers = {
+            'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.111 Safari/537.36',
+            'Referer': "https://www.rosbank.ru/",
+            'Accept': 'application/json, text/plain, */*',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7,es;q=0.6,ja;q=0.5',
+            'Content-Type': "application/json;",
+            'Origin': "https://www.rosbank.ru",
+            'Sec-Fetch-Dest': "empty",
+            'Sec-Fetch-Mode': "cors",
+            'Sec-Fetch-Site': "same-site",
+
+        }
+
+    def do_json(self):
+        if 'success' in self.response_json:
+            if 'id' in self.response_json:
+                self.success = True
+                return self.response_json['id']
+
+
+class Kontur(RequestsGarantTestBaseUrl):
+    base_url = 'https://api-crm-billing.kontur.ru'
+    base_url_test = 'https://api-billy-crm.testkontur.ru/'
+
+
+    def __init__(self, json, test):
+        super().__init__()
+        self.test = test
+        self.json = json
+        self.headers = {'x-Auth-CustomToken': os.environ.get('kontur_token_test') if test else os.environ.get('kontur_token_prod')}
+
+    def do_json(self):
+        self.prospective_sale_id = self.response_json.get('ProspectiveSaleId')
+        if self.prospective_sale_id is not None:
+            self.success = True
+            return self.suc_resp()
+        results = self.response_json.get('Results')
+        if results is not None:
+            if results:
+                message = results[0].get('Message')
+                if message is not None:
+                    if message in self.invalids:
+                        self.success = True
+                        return inn_busy
+
+
+class KonturCanCreate(Kontur):
+    invalids = [
+        'Есть такая же потенциальная продажа в запрашиваемом PartnerCode',
+        'Есть такая же потенциальная продажа в другом PartnerCode'
+    ]
+    def __init__(self, json, test):
+        super().__init__(json, test)
+        self.endpoint = '/prospectivesales/cancreate/v2'
+        self.method = 'post'
+
+
+    def suc_resp(self):
+        return inn_freedom
+
+
+
+
+
+
+
+class KonturProspectiveSales(Kontur):
+    invalids = ['Потенциальная продажа с таким Id уже существует']
+    def __init__(self, json, test):
+        super().__init__(json, test)
+        self.endpoint = '/prospectivesales/create/v4'
+        self.method = 'post'
+
+
+    def suc_resp(self):
+        return self.prospective_sale_id
+
+

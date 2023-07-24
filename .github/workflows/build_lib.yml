@@ -1,0 +1,51 @@
+name: Build lib
+
+on:
+  push:
+    branches: [ raifazen ]
+
+env:
+  PYTHONIOENCODING: UTF-8
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        include:
+          - os: ubuntu-latest
+            path: ~/.cache/pip
+            venv-path: source venv/bin/activate
+        python-version: [3.9]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: syphar/restore-virtualenv@v1
+        id: cache-virtualenv
+        with:
+          requirement_files: requirements.txt
+
+      - uses: syphar/restore-pip-download-cache@v1
+        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install build
+        if: steps.cache-virtualenv.outputs.cache-hit != 'true'
+
+      - name: Build package
+        run: python -m build
+      - name: Publish package
+        uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
