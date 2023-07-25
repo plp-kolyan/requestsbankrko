@@ -1388,3 +1388,8 @@ class KonturTestCase(TestCase):
 
         # }
         print(KonturProspectiveSales(json, True).get_rezult())
+
+class DevelopTest(TestCase):
+    def test_0(self):
+        inn = '800009370'
+        print(mutation_inn(inn))

@@ -902,3 +902,9 @@ class KonturProspectiveSales(Kontur):
         return self.prospective_sale_id
 
 
+def mutation_inn(inn: str):
+    inn = str(inn)
+    if len(inn) in [9, 11]:
+        inn = '0' + inn
+    return inn
+
