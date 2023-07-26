@@ -772,6 +772,9 @@ class PSBParent(Aut, PSBall):
         r = super().get_response_production()
         return r
 
+    def do_json_wrapper(self):
+        return self.response_json
+
 
 class PSBScoring(PSBParent):
 
@@ -799,6 +802,8 @@ class PSBdfmqueue(PSBParent):
         self.json = json_dict
         self.endpoint = f'/dfm/queue'
         self.method = 'post'
+
+
 
 class PSBdfmqueueid(PSBParent):
     def __init__(self, id, test):
