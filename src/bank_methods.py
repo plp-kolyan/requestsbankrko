@@ -793,18 +793,18 @@ class PSBScoring(PSBParent):
                 return inn_busy
 
 
-class PSBdtfmqueue(PSBParent):
+class PSBdfmqueue(PSBParent):
     def __init__(self, json_dict, test):
         super().__init__(test)
         self.json = json_dict
         self.endpoint = f'/dfm/queue'
         self.method = 'post'
 
-class PSBdtfmqueueid(PSBParent):
-    def __init__(self, params, test):
+class PSBdfmqueueid(PSBParent):
+    def __init__(self, id, test):
         super().__init__(test)
-        self.params = params
         self.method = 'get'
+        self.endpoint = f'/dfm/queue/{id}'
 
 
 

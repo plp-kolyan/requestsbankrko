@@ -1401,6 +1401,6 @@ class PSBdtfmqueueTestCase(TestCase):
         json_dict = {
             "inns": ['665813932028']
         }
-        obj = PSBdtfmqueue(json_dict, False).get_obj_rezult()
+        obj = PSBdfmqueue(json_dict, False).get_obj_rezult()
         print(obj.response.text)
         print()
