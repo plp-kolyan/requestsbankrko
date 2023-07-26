@@ -803,6 +803,12 @@ class PSBdfmqueue(PSBParent):
         self.endpoint = f'/dfm/queue'
         self.method = 'post'
 
+    def do_json_wrapper(self):
+        queue_id = self.response_json.get('queue_id')
+        if queue_id is not None:
+            self.success = True
+            return queue_id
+
 
 
 class PSBdfmqueueid(PSBParent):
@@ -810,6 +816,17 @@ class PSBdfmqueueid(PSBParent):
         super().__init__(test)
         self.method = 'get'
         self.endpoint = f'/dfm/queue/{id}'
+        in_que = False
+
+    def do_json_wrapper(self):
+        status, data = (self.response_json.get(key) for key in ['status', 'data'])
+
+        if status == 'завершено' and isinstance(data, list):
+            self.success = True
+            return data
+
+        elif status == 'в обработке':
+            self.in_que = True
 
 
 
