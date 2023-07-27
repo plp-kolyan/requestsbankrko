@@ -816,7 +816,7 @@ class PSBdfmqueueid(PSBParent):
         super().__init__(test)
         self.method = 'get'
         self.endpoint = f'/dfm/queue/{id}'
-        in_que = False
+        self.in_que = False
 
     def do_json_wrapper(self):
         status, data = (self.response_json.get(key) for key in ['status', 'data'])
