@@ -191,7 +191,7 @@ class VTBScoringTestCase(TestCase):
         obj = VTBScoring(self.json)
         obj.response_json = {'httpCode': '401', 'httpMessage': 'Unauthorized',
                              'moreInformation': "<BackErr> needConfirm"}
-        obj.do_json()
+        print(obj.do_json())
         self.assertEqual(obj.success, True)
         self.assertEqual(sorted([dict_client['inn'] for dict_client in obj.rezult]),
                          sorted([json['inn'] for json in self.json['leads']]))
