@@ -217,6 +217,7 @@ class VTBFather(Aut, VTBBigFather):
     def __init__(self, json):
         VTBBigFather.__init__(self)
         ERROR_AUT_KEY_VAL_CHOICES = (
+
             ('reason', 'Unauthorized'),
             ('errorMessage', 'the header <Authorization> was not received in the request'),
             ('error', 'key not authorized: no matching policy found')
