@@ -157,9 +157,7 @@ class VTBStatusLeadTestCase(TestCase):
 
 class VTBScoringTestCase(TestCase):
     def setUp(self):
-        self.json = {
-            "leads": [{"inn": "9721194775", "productCode": "Payments"}, {"inn": "780448824307", "productCode": "Payments"}, {"inn": "540317272444", "productCode": "Payments"}, {"inn": "661908324831", "productCode": "Payments"}, {"inn": "665800616459", "productCode": "Payments"}, {"inn": "665802770417", "productCode": "Payments"}]
-        }
+        self.json =  {"leads": [{"inn": "5262392611", "productCode": "Payments"}, {"inn": "5249180784", "productCode": "Payments"}, {"inn": "7456053403", "productCode": "Payments"}]}
 
     # def test_test(self):
     #     obj = VTBScoring(self.json)  #
@@ -205,6 +203,22 @@ class VTBScoringTestCase(TestCase):
         self.assertEqual(obj.success, True)
         self.assertEqual(sorted([dict_client['inn'] for dict_client in obj.rezult]),
                          sorted([json['inn'] for json in self.json['leads']]))
+
+    def test_err(self):
+        obj = VTBScoring(self.json)
+        print(obj.__dict__)
+        obj.response_json = {'leads': [{'inn': '7456053403', 'productCode': 'Payments', 'responseCode': 'NEGATIVE', 'responseCodeDescription': 'Лид не будет взят в работу'}, {'inn': '5262392611', 'productCode': 'Payments', 'responseCode': 'NEGATIVE', 'responseCodeDescription': 'Лид не будет взят в работу'}, {'inn': '5249180784', 'productCode': 'Payments', 'responseCode': 'NEGATIVE', 'responseCodeDescription': 'Лид не будет взят в работу'}]}
+        obj.do_json()
+        print(obj.rezult)
+        # self.assertEqual(obj.success, True)
+        # self.assertEqual(sorted([dict_client['inn'] for dict_client in obj.rezult]),
+        #                  sorted([json['inn'] for json in self.json['leads']]))
+
+    def test_response(self):
+        obj = VTBScoring(self.json)
+        print(obj.get_rezult())
+        print(obj.response.status_code)
+        print(obj.success)
 
 
 class VTBLeadTestCase(TestCase):
@@ -1389,6 +1403,74 @@ class KonturTestCase(TestCase):
 
         # }
         print(KonturProspectiveSales(json, True).get_rezult())
+
+class Kontur(TestCase):
+    '''
+:authority:
+elba.kontur.ru
+:method:
+POST
+:path:
+/PublicInterface/Registration/SpecialPartnerRegistration/Register?utm_referer=www.google.com&utm_source=google&utm_medium=organic&utm_startpage=kontur.ru%2Felba&utm_orderpage=kontur.ru%2Felba&from=kontur.ru-registration&back=https%3a%2f%2fkontur.ru%2f&p=w19854
+:scheme:
+https
+Accept:
+text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Accept-Encoding:
+gzip, deflate, br
+Accept-Language:
+ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
+Cache-Control:
+max-age=0
+Content-Length:
+66
+Content-Type:
+application/x-www-form-urlencoded
+Cookie:
+ngtoken=LhHOC2TtrPlfmzgGM0MIAg==; _gcl_au=1.1.1529092860.1693297916; _ym_uid=1693297916574829336; _ym_d=1693297916; tmr_lvid=6042c49263bcdeb02a1fed45bcf48e68; tmr_lvidTS=1693297916595; adtech_uid=f1449c65-747b-4d8a-a4d6-9523e25632ab%3Akontur.ru; top100_id=t1.7709112.1458336977.1693297916706; sr_singular=45b9fa5d-bf37-47d1-92c9-0f2416f8b946; _gid=GA1.2.768594663.1693471363; _ym_isad=2; device=f4adb4616ab33c0205a58aeea391192a.Q0JFMUVERkItRTkwRi00Q0NELUFEN0EtRDIxQUQxNDdENDlD.60c5853ae810e85401d7d7194a46f565d90a3f9b83e4f6c445016eb171a6dd2b; token=djnDp40Uq44g1Mr0fBd5tjYIz6G1HBQE6+tiijkxwn2rkSS55gRzZVY8a1yD40nsKxC13IvYu7kIi9HYkRe0XsE6kCzdhWNaaFgAn3/n2Dlo8VIMV2Xf+MJ1Waw2h5uh; auth.check=281225CA4A3D456AA50FAD952D498E3229D65B1C30BB8348D3C753F38F549D71; portaluserid=cb82dba5-4491-4437-aa5b-689f6486c4d7; auth.sid=A5DB82CB91443744AA5B689F6486C4D7980C2BAA8C4D4D4B9B6575D70F3E98DC; kontur.ru-go-product-bk=1; kontur.ru-go-product-elba=1; originalReferer=kontur.ru; elba_c=OuJsn3DRZahjID1E5af6ylSRasE3OfijByw38yGa31Y=; trafficSourceId=1ac3c2c3-ff68-4c3a-a125-51f03de22d01; __elbaRequestVerificationToken=7AU6Ym4Xr_eoQ12Rk1V1rLb4usnnQKzxz_KHFw411lPJm2UJgaIA3XETFyDDWZ9DCS4EeFx0JqWXQLIRvad8j1uekoA1; _ga=GA1.3.1085211295.1693297916; _gid=GA1.3.768594663.1693471363; elba_a=elba; route=89c2c360-8a27-4527-b42d-92572da396a0; elbaRoute=WIN-ELBA6:80; browserInfoSaved=true; _mfp=f2a3e300d8027a060c63e816d142fcc5; _ym_visorc=w; _ga_K1PCLBF82L=GS1.1.1693489557.2.1.1693489817.59.0.0; elba_s=6MaDLjZH/oebqLDkGwzd7O88ju34PPQ7F03lkKVsQI/dc/5yVREgF8AWuOqZjIDNE4KLJIQfTh+eb2pL4bDkFQ==; _gat=1; last_visit=1693464715188%3A%3A1693489915188; _ga=GA1.2.1085211295.1693297916; _dc_gtm_UA-1690345-1=1; _ga_7KL0H96E15=GS1.1.1693489616.5.1.1693489922.39.0.0; t3_sid_7709112=s1.1573758995.1693489616700.1693489932999.5.7
+Origin:
+https://kontur.ru
+Referer:
+https://kontur.ru/
+Sec-Ch-Ua:
+"Chromium";v="116", "Not)A;Brand";v="24", "Google Chrome";v="116"
+Sec-Ch-Ua-Mobile:
+?0
+Sec-Ch-Ua-Platform:
+"Windows"
+Sec-Fetch-Dest:
+document
+Sec-Fetch-Mode:
+navigate
+Sec-Fetch-Site:
+same-site
+Sec-Fetch-User:
+?1
+Upgrade-Insecure-Requests:
+1
+User-Agent:
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36
+
+
+
+
+параметры строки запроса
+utm_referer: www.google.com
+utm_source: google
+utm_medium: organic
+utm_startpage: kontur.ru/elba
+utm_orderpage: kontur.ru/elba
+from: kontur.ru-registration
+back: https://kontur.ru/
+p: w19854
+
+
+данные форм
+login: direkt-killer1@ya.ru
+password: ry2dw14gva9
+promocode: w19854
+    '''
+
 
 class DevelopTest(TestCase):
     def test_0(self):
