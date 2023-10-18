@@ -620,7 +620,42 @@ class TochkaLeedRef(RequestsGarant):
 #         {"needcaptcha":1}
 # 'sitekey' : '6LcZ1zIUAAAAAIdX_hL_-LgO6OXS1nMEM8-E-E8m',
 
+class TochkaLeedRefProcces(RequestsGarant):
+    def __init__(self, json):
+        super().__init__()
+        self.data = json
 
+        self.headers = {
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Connection': 'keep-alive',
+            'Content-Length': '1809',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'Host': 'forms.tildacdn.com',
+            'Origin': 'https://partner.tochka.com',
+            'Referer': 'https://partner.tochka.com/',
+            'sec-ch-ua': '"Chromium";v="118", "Google Chrome";v="118", "Not=A?Brand";v="99"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'cross-site',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
+
+        }
+        self.method = 'post'
+        self.url = 'https://forms.tildacdn.com/procces/'
+        # self.proxy = proxy
+        # self.proxies = {'https': f'http://{self.proxy}/'}
+        self.needcaptcha = False
+
+    def do_json(self):
+        if 'needcaptcha' in self.response_json:
+            self.needcaptcha = True
+        elif 'results' in self.response_json:
+            self.success = True
+            return str(self.response_json['results'])
 
 
 class MoeDelo(RequestsGarantTestHeaders):

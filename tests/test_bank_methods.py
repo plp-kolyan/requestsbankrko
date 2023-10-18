@@ -422,6 +422,15 @@ class TestTochkaLeedRef(TestCase):
                 }
 
 
+
+    def test_two_key(self):
+        d = {
+            'formservices[]': '0fbed463800a41e46b1701815e7de89d',
+            'formservices[]': 'cce79d01ee38caf45a0e1bb6cf8253bc'
+        }
+        print(d)
+
+
     def test_get_rezult(self):
         self.obj = TochkaLeedRef(self.json)
         print(self.obj.get_rezult())
@@ -431,26 +440,23 @@ class TestTochkaLeedRef(TestCase):
     def test_0(self):
         print(get_recaptcha_v2('47.241.165.133:443'))
 
+    def test_open(self):
+        with open('tests/proxies.txt', 'r') as file:
+            print(file.read().splitlines())
+
     def test_1(self):
-        proxies_list = ["154.26.134.214:80", "154.26.134.217:80", "47.241.165.133:443", "15.235.150.136:80", "47.74.152.29:8888",
-         "174.138.24.67:8080", "112.140.186.124:808", "118.107.44.181:80", "118.107.44.181:8000", "45.12.31.35:80",
-         "45.14.174.110:80", "141.101.120.156:80", "172.67.208.171:80", "23.227.38.11:80", "203.34.28.8:80",
-         "203.22.223.136:80", "203.30.191.227:80", "185.162.229.41:80", "185.162.231.6:80", "203.23.106.75:80",
-         "203.23.103.12:80", "45.8.107.166:80", "203.28.9.225:80", "203.23.103.57:80", "203.24.108.96:80",
-         "203.13.32.213:80", "185.162.231.163:80", "45.8.106.205:80", "203.24.109.184:80", "203.28.9.118:80",
-         "185.162.229.171:80", "203.13.32.137:80", "45.12.30.121:80", "45.8.106.110:80", "203.13.32.72:80",
-         "185.162.228.83:80", "203.30.190.49:80", "203.34.28.245:80", "203.28.9.201:80", "203.32.120.98:80",
-         "203.24.109.181:80", "45.14.174.63:80", "203.32.120.153:80", "203.13.32.63:80", "45.8.107.143:80",
-         "185.162.229.237:80", "141.193.213.179:80", "172.67.185.188:80", "185.238.228.171:80", "185.238.228.144:80",
-         "172.67.55.32:80", "141.101.121.44:80", "141.101.121.12:80", "141.101.122.64:80", "141.101.122.111:80",
-         "172.67.165.253:80", "172.67.253.207:80", "172.67.70.50:80", "172.67.23.197:80", "172.67.180.8:80",
-         "45.12.31.190:80", "203.24.109.202:80", "203.13.32.166:80", "45.8.107.49:80"]
+        import time
+        with open('tests/proxies.txt', 'r') as file:
+            proxies_list = file.read().splitlines()
+
 
 
         print(len(proxies_list))
         for proxy in proxies_list:
-            ob = TochkaLeedRef(self.json, proxy).get_obj_rezult()
+            self.proxies = {'https': f'http://{proxy}/'}
+            ob = TochkaLeedRef(self.json).get_obj_rezult()
             print(f"{ob.rezult} == {proxy}")
+            time.sleep(1)
         #     if ob.success:
         #         print(f'{proxy} - рабочий')
         #         break
@@ -460,6 +466,47 @@ class TestTochkaLeedRef(TestCase):
         proxy = '47.241.165.133:443'
         ob = TochkaLeedRef(self.json, proxy).get_obj_rezult()
         print(ob.rezult)
+
+
+class TestTochkaLeedRefProcces(TestCase):
+    def setUp(self) -> None:
+        self.json = {
+            'formservices[]': '6d11056b82427faadcecf14ad36dcd17',
+            'phone': '+7(905) 081 - 8476',
+            'advid': 'kckireev',
+            'yandex_uid': '',
+            'page_description': 'Заявка на счёт',
+            'page_url': 'partner.tochka.com/',
+            'gclid': '',
+            'crm_type': 'signup',
+            'form-spec-comments': '',
+            'tildaspec - referer': 'https://partner.tochka.com/?referer1=kckireev#form',
+            'tildaspec-formid': 'form527521569',
+            'tildaspec-formskey': '8e01b006ad02c72decfea4d870db663d',
+            'tildaspec-version-lib': '02.001',
+            'tildaspec-pageid': 2727052,
+            'tildaspec-projectid': 650828,
+            'tildaspec-lang': 'RU',
+            'tildaspec-fp': 'st5068w1318h963ft288.593755068'
+
+        }
+
+    def test_1(self):
+        print(TochkaLeedRefProcces(self.json).get_rezult())
+
+    def test_2(self):
+        import time
+        with open('tests/proxies.txt', 'r') as file:
+            proxies_list = file.read().splitlines()
+
+
+
+        print(len(proxies_list))
+        for proxy in proxies_list:
+            self.proxies = {'https': f'http://{proxy}/'}
+            ob = TochkaLeedRefProcces(self.json).get_obj_rezult()
+            print(f"{ob.rezult} == {proxy}")
+            time.sleep(1)
 
 
 class TochkaRegistryUrTestCase(TestCase):
@@ -1469,6 +1516,16 @@ p: w19854
 login: direkt-killer1@ya.ru
 password: ry2dw14gva9
 promocode: w19854
+
+   ВТорая форма выбор организации
+
+
+
+
+
+
+
+
     '''
 
 
@@ -1481,8 +1538,13 @@ class DevelopTest(TestCase):
 class PSBdtfmqueueTestCase(TestCase):
     def test_0(self):
         json_dict = {
-            "inns": ['665813932028']
+            "inns": ['272322168097']
         }
         obj = PSBdfmqueue(json_dict, False).get_obj_rezult()
+        print(obj.response.text)
+        print()
+
+    def test_1(self):
+        obj = PSBdfmqueueid(20230, False).get_obj_rezult()
         print(obj.response.text)
         print()
