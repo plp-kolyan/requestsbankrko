@@ -473,6 +473,7 @@ class TestTochkaLeedRefProcces(TestCase):
         self.json = {
             'formservices[]': '6d11056b82427faadcecf14ad36dcd17',
             'phone': '+7(905) 081 - 8476',
+            'inn': '222210923416',
             'advid': 'kckireev',
             'yandex_uid': '',
             'page_description': 'Заявка на счёт',
@@ -504,10 +505,44 @@ class TestTochkaLeedRefProcces(TestCase):
 
         print(len(proxies_list))
         for proxy in proxies_list:
-            self.proxies = {'https': f'http://{proxy}/'}
-            ob = TochkaLeedRefProcces(self.json).get_obj_rezult()
+
+            ob = TochkaLeedRefProcces(self.json)
+            ob.proxies = {'https': f'http://{proxy}/'}
+            ob.get_obj_rezult()
             print(f"{ob.rezult} == {proxy}")
             time.sleep(1)
+
+    def test_3(self):
+        ob = TochkaLeedRefProcces(self.json)
+        ob.proxies = {'https': f'http://L8DNeA:Y9ZYT9@38.153.31.120:9322/'}
+        ob.get_obj_rezult()
+        print(f"{ob.rezult} == {ob.args_request}")
+
+    def test_5(self):
+
+        with open('proxies.json', 'w', encoding='utf-8') as file:
+            json.dump({
+    "L8DNeA:Y9ZYT9@38.153.31.120:9322":
+      {
+        "time": 0,
+        "no_ban": True,
+      },
+    "static":
+      {
+        "time": 0,
+        "no_ban": True,
+      }
+}, file, indent=4, ensure_ascii=False)
+
+        print(time.time())
+
+    def test_do_json(self):
+        with open('proxies.json', 'r', encoding='utf-8') as file:
+            print(json.load(file))
+
+    def test_6(self):
+        pass
+
 
 
 class TochkaRegistryUrTestCase(TestCase):
