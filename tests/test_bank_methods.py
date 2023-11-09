@@ -295,6 +295,28 @@ class VTBLeadTestCase(TestCase):
         print(obj.success)
         print(obj.resend_send)
 
+    def test_tocken_txt(self):
+        obj = VTBLead(self.json, True, 'VTBToken2')
+        print(obj.__dict__)
+        print(obj.__dict__['path_token'])
+
+    def test_tocken_obj(self):
+        obj = VTBLead(self.json, True, 'VTBToken2')
+        token_obj = obj.token_cls()
+        print(token_obj.__dict__['credits'])
+
+    def test_vtb_tocken(self):
+        obj = VTBLead(self.json, True, True)
+        obj.write_token()
+
+        print(obj.path_token)
+        print(obj.token_obj.args_request)
+        print(obj.token_obj.rezult)
+
+        print(obj.get_client_id())
+        print(obj.get_token())
+
+
 
 
 
@@ -472,8 +494,8 @@ class TestTochkaLeedRefProcces(TestCase):
     def setUp(self) -> None:
         self.json = {
             'formservices[]': '6d11056b82427faadcecf14ad36dcd17',
-            'phone': '+7(905) 081 - 8476',
-            'inn': '222210923416',
+            'phone': '+7 (914) 692-6084',
+            # 'inn': '222210923416',
             'advid': 'kckireev',
             'yandex_uid': '',
             'page_description': 'Заявка на счёт',
@@ -1025,7 +1047,7 @@ class AlfaCityTestCase(TestCase):
 class VTBtokenTestCase(TestCase):
     def setUp(self):
         self.obj = VTBToken()
-        print(self.obj.cert)
+
 
     def test_get_rezult(self):
         print(self.obj.path_vtb_token)
@@ -1204,7 +1226,8 @@ class TokenTestCase(TestCase):
         print(self.obj.get())
 
     def test_2(self):
-        print(self.obj.write())
+        print(self.obj.args_token_cls)
+        # print(self.obj.write_token())
 
 
 
@@ -1584,3 +1607,7 @@ class PSBdtfmqueueTestCase(TestCase):
         obj = PSBdfmqueueid(20230, False).get_obj_rezult()
         print(obj.response.text)
         print()
+
+class VTBBigFatherTwoTestCase(TestCase):
+    def test_0(self):
+        pass

@@ -147,15 +147,21 @@ class VTBBigFather(RequestsGarant):
         import urllib3
         urllib3.disable_warnings()
         super().__init__()
+
         # self.cert = f'{os.path.abspath(os.curdir)}/src/certs.pem'
         self.verify = False
         self.url = 'https://gw.api.vtb.ru:443/openapi/smb/lecs/lead-impers/v1/'
 
 
 class Aut:
-    args_token_cls = ()
-    def __init__(self, token_cls, ERROR_AUT_KEY_VAL_CHOICES):
-        self.path_token = f'{os.path.abspath(os.curdir)}/{token_cls.__name__}.txt'.replace('venv\Lib\site-packages/', '')
+
+    def __init__(self, token_cls, ERROR_AUT_KEY_VAL_CHOICES, tocken_two=False, args_token_cls=()):
+        tocken_txt = token_cls.__name__
+        if tocken_two:
+            self.args_token_cls = args_token_cls
+            tocken_txt += 'two'
+        self.args_token_cls=args_token_cls
+        self.path_token = f'{os.path.abspath(os.curdir)}/{tocken_txt}.txt'.replace('venv\Lib\site-packages/', '')
         self.token_cls = token_cls
         self.ERROR_AUT_KEY_VAL_CHOICES = ERROR_AUT_KEY_VAL_CHOICES
 
@@ -166,9 +172,9 @@ class Aut:
                     return True
 
     def write_token(self):
-        token_obj = self.token_cls(*self.args_token_cls)
-        rezult = token_obj.get_rezult()
-        if token_obj.success is True:
+        self.token_obj = self.token_cls(*self.args_token_cls)
+        rezult = self.token_obj.get_rezult()
+        if self.token_obj.success is True:
             with open(self.path_token, 'w') as file:
                 file.write(rezult)
             return rezult
@@ -198,9 +204,16 @@ class Aut:
 
 
 class VTBToken(VTBBigFather):
-    def __init__(self):
+    def __init__(self, two_credits=False):
         super().__init__()
         self.data = self.credits
+        if two_credits:
+            self.data.update({
+                'client_id': os.environ.get('vtb_client_id_two'),
+                'client_secret': os.environ.get('vtb_client_secret_two')
+            })
+
+
 
         self.url = 'https://open.api.vtb.ru:443/passport/oauth2/token'
         self.method = 'post'
@@ -215,15 +228,17 @@ class VTBToken(VTBBigFather):
 
 
 class VTBFather(Aut, VTBBigFather):
+    ERROR_AUT_KEY_VAL_CHOICES = (
+
+        ('reason', 'Unauthorized'),
+        ('errorMessage', 'the header <Authorization> was not received in the request'),
+        ('error', 'key not authorized: no matching policy found')
+    )
+
     def __init__(self, json):
         VTBBigFather.__init__(self)
-        ERROR_AUT_KEY_VAL_CHOICES = (
 
-            ('reason', 'Unauthorized'),
-            ('errorMessage', 'the header <Authorization> was not received in the request'),
-            ('error', 'key not authorized: no matching policy found')
-        )
-        Aut.__init__(self, VTBToken, ERROR_AUT_KEY_VAL_CHOICES)
+        Aut.__init__(self, VTBToken, self.ERROR_AUT_KEY_VAL_CHOICES)
         self.method = 'post'
         self.json = json
 
@@ -268,12 +283,15 @@ class VTBFather(Aut, VTBBigFather):
         return super().get_response_production()
 
 
+
 class VTBStatusLead(VTBFather):
     def __init__(self, json):
         super().__init__(json)
         self.params = json
         self.url += 'leads'
         self.method = 'get'
+
+
 
 
 class VTBScoring(VTBFather):
@@ -293,9 +311,14 @@ class VTBScoring(VTBFather):
         return do_json_father
 
 
+
+
 class VTBLead(VTBFather):
-    def __init__(self, json, test=test):
+    def __init__(self, json, test=test, tocken_two=False):
         super().__init__(json)
+
+        Aut.__init__(self, VTBToken, VTBFather.ERROR_AUT_KEY_VAL_CHOICES, tocken_two)
+        self.tocken_two = tocken_two
         self.test = test
         self.custom_test = True
         self.url += 'leads_impersonal'
@@ -306,6 +329,21 @@ class VTBLead(VTBFather):
                  'responseCodeDescription': 'Операция выполнена успешно'} for lead in self.json['leads']]
 
         self.json_response_test = {"leads": data}
+
+    def get_client_id(self):
+        if self.tocken_two:
+            client_id = os.environ.get('vtb_client_id_two')
+        else:
+            client_id = self.credits['client_id'].replace('@ext.vtb.ru', '')
+        return client_id
+
+    def get_response_production(self):
+        client_id = self.get_client_id()
+        self.args_request.update({'headers': {
+                'X-IBM-Client-Id': client_id,
+                'Authorization': f'Bearer {self.get_token()}'
+            }})
+        return super().get_response_production()
 
 
 class Open(RequestsGarantTestEndpoint):
