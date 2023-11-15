@@ -2,6 +2,8 @@ import json
 import os
 import time
 from datetime import timezone
+
+import requests
 from jsoncustom import JsonCustom
 from dotenv import load_dotenv, dotenv_values
 from requestsgarant import (
@@ -343,7 +345,8 @@ class VTBLead(VTBFather):
                 'X-IBM-Client-Id': client_id,
                 'Authorization': f'Bearer {self.get_token()}'
             }})
-        return super().get_response_production()
+        # return super().get_response_production()
+        return requests.request(**self.args_request)
 
 
 class Open(RequestsGarantTestEndpoint):
