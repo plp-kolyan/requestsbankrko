@@ -306,7 +306,7 @@ class VTBLeadTestCase(TestCase):
         print(token_obj.__dict__['credits'])
 
     def test_vtb_tocken(self):
-        obj = VTBLead(self.json, True, True)
+        obj = VTBLead(self.json, True, False)
         obj.write_token()
 
         print(obj.path_token)

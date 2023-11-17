@@ -319,7 +319,7 @@ class VTBLead(VTBFather):
     def __init__(self, json, test=test, tocken_two=False):
         super().__init__(json)
 
-        Aut.__init__(self, VTBToken, VTBFather.ERROR_AUT_KEY_VAL_CHOICES, tocken_two)
+        Aut.__init__(self, VTBToken, VTBFather.ERROR_AUT_KEY_VAL_CHOICES, tocken_two, (tocken_two,))
         self.tocken_two = tocken_two
         self.test = test
         self.custom_test = True
