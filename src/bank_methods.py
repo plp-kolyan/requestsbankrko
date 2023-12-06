@@ -208,7 +208,7 @@ class Aut:
 class VTBToken(VTBBigFather):
     def __init__(self, two_credits=False):
         super().__init__()
-        self.data = self.credits
+        self.data = self.credits.copy()
         if two_credits:
             self.data.update({
                 'client_id': os.environ.get('vtb_client_id_two'),

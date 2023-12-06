@@ -316,6 +316,10 @@ class VTBLeadTestCase(TestCase):
         print(obj.get_client_id())
         print(obj.get_token())
 
+    def test_vtb_response(self):
+        obj = VTBLead(self.json, True, False)
+        print(obj.get_rezult())
+
 
 
 
