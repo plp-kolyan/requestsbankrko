@@ -87,6 +87,7 @@ class AlfaStatusLead(Alfa):
 
 
 class AlfaScoring(Alfa):
+    dict_key = {'API-key': os.environ.get('alfabank_dict_key_old')}
     def __init__(self, json, test=test):
         super().__init__(test)
         self.json = json

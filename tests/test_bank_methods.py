@@ -50,8 +50,8 @@ class AlfaScoringTestCaset(TestCase):
     def setUp(self) -> None:
         self.key = os.environ.get('alfabank_dict_key')
         self.json = {
-            'organizationInfo': {'inn': '6685003097'},
-            "contactInfo": [{"phoneNumber": '79600417480'}],
+            'organizationInfo': {'inn': '228394668965'},
+            "contactInfo": [{"phoneNumber": '79619912159'}],
             "productInfo": [{"productCode": "LP_RKO"}]
         }
 
@@ -68,8 +68,11 @@ class AlfaScoringTestCaset(TestCase):
     def test_get_rezult_false(self):
         obj = AlfaScoring(self.json, False)
         obj.get_rezult()
-        self.assertEqual(obj.success, True)
+        print(obj.args_request)
         print(obj.response)
+        print(obj.response_json)
+        self.assertEqual(obj.success, True)
+
         self.assertIn(obj.rezult, ['Свободен', 'Занят'])
 
     def test_get_rezult_true(self):
@@ -84,17 +87,17 @@ class AlfaLeadTestCase(TestCase):
         self.key = os.environ.get('alfabank_dict_key')
         self.json = {
             'organizationInfo': {
-                'organizationName': 'ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ "ВЕЛ-ТОРГ"',
-                'inn': '9725074920',
+                'organizationName': 'ИНДИВИДУАЛЬНЫЙ ПРЕДПРИНИМАТЕЛЬ КАНДАУРОВ ИВАН СЕРГЕЕВИЧ',
+                'inn': '272292625949',
             },
             'contactInfo': [{
-                "fullName": 'РОМАНОВ НИКОЛАЙ ВАСИЛЬЕВИЧ',
-                "phoneNumber": '79771036772',
+                "fullName": 'КАНДАУРОВ ИВАН СЕРГЕЕВИЧ',
+                "phoneNumber": '79242015525',
             }
             ],
             "requestInfo": {
                 "comment": '',
-                "cityCode": '9fdcc25f-a3d0-4f28-8b61-40648d099065'
+                "cityCode": '298e0b86-950a-4df9-b975-204964f6ed5a'
             },
             "productInfo": [{"productCode": "LP_RKO"}]
         }
@@ -115,10 +118,11 @@ class AlfaLeadTestCase(TestCase):
         self.assertEqual(obj.args_request['headers']['API-key'], 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa')
 
     def test_get_rezult(self):
-        obj = AlfaLead(self.json, True)
+        obj = AlfaLead(self.json, False)
         obj.get_rezult()
         self.assertEqual(obj.success, True)
         print(obj.rezult)
+        print(obj.response_json)
         self.assertRegex(obj.rezult,
                          r'^[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}')
 
@@ -418,7 +422,7 @@ class TestTochkaLeedRef(TestCase):
 
         self.json = {
                 'formservices[]': 'c1dbed398635e5729a7f32d17aeb88de',
-                'phone': '+7 (927) 571-4003',
+                'phone': '+7 (924) 163-1756',
                 'advid': 'kckireev',
                 'page_description': 'Заявку оставили за клиента сотрудники партнёра. Обычное предложение РКО.',
 
@@ -426,8 +430,9 @@ class TestTochkaLeedRef(TestCase):
 
                 'page_url': 'partner.tochka.com/fp/',
 
-                'inn': '3000003670',
-                'comment': 'ТЕСТОВАЯ ЗАЯВКА',
+                # 'inn': '3000003670',
+                'inn': '027007704717',
+                'comment': 'АЛЬСИНА',
                 'crm_type': 'signup',
                 'gclid': '',
                 'form-spec-comments': '',
