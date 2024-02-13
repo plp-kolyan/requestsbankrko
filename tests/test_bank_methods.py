@@ -1620,3 +1620,16 @@ class PSBdtfmqueueTestCase(TestCase):
 class VTBBigFatherTwoTestCase(TestCase):
     def test_0(self):
         pass
+
+
+class KombinatorTestCase(TestCase):
+    def test_0(self):
+        surname = 'Александров'
+        first_name = 'Николай'
+        patronomic = 'Владимирович'
+        phone = '777'
+        mail = ''
+        test = True
+        obj = Kombinator(surname, first_name, patronomic, phone, mail, test).get_obj_rezult()
+        print(obj.rezult)
+        print(obj.response_json)

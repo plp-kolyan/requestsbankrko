@@ -1025,3 +1025,22 @@ def mutation_inn(inn: str):
         inn = '0' + inn
     return inn
 
+class Kombinator(RequestsGarant):
+    kombinator_secret = os.environ.get('kombinator_secret')
+    def __init__(self, surname, first_name, patronomic, phone, mail, test):
+        super().__init__()
+        self.method = 'get'
+
+        self.url = f'https://enterra.bitrix24.ru/rest/1/{self.kombinator_secret}' \
+                   f"/crm.lead.add.json?FIELDS[TITLE]={'Тестовая заявка' if test else surname + ' ' + first_name + ' ' +patronomic}" \
+                   f'&FIELDS[NAME]={first_name}' \
+                   f'&FIELDS[LAST_NAME]={surname}' \
+                   f'&FIELDS[EMAIL][0][VALUE]={mail}' \
+                   f'&FIELDS[EMAIL][0][VALUE_TYPE]=WORK' \
+                   f'&FIELDS[PHONE][0][VALUE]={phone}' \
+                   f'&FIELDS[PHONE][0][VALUE_TYPE]=WORK'
+
+    def do_json(self):
+        if 'result' in self.response_json:
+            self.success = True
+            return self.response_json['result']
