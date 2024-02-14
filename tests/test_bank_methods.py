@@ -1628,8 +1628,12 @@ class KombinatorTestCase(TestCase):
         first_name = 'Николай'
         patronomic = 'Владимирович'
         phone = '777'
-        mail = ''
+        mail = 't@mail.ru'
+        name_company = 'ИП Александров'
+        adress = 'город Барнаул'
+        comment = 'тестовый коммент'
+
         test = True
-        obj = Kombinator(surname, first_name, patronomic, phone, mail, test).get_obj_rezult()
+        obj = Kombinator(surname, first_name, patronomic, phone, mail, name_company, adress, comment, test).get_obj_rezult()
         print(obj.rezult)
         print(obj.response_json)

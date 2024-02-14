@@ -1027,7 +1027,7 @@ def mutation_inn(inn: str):
 
 class Kombinator(RequestsGarant):
     kombinator_secret = os.environ.get('kombinator_secret')
-    def __init__(self, surname, first_name, patronomic, phone, mail, test):
+    def __init__(self, surname, first_name, patronomic, phone, mail, name_company, adress, comment, test):
         super().__init__()
         self.method = 'get'
 
@@ -1038,7 +1038,11 @@ class Kombinator(RequestsGarant):
                    f'&FIELDS[EMAIL][0][VALUE]={mail}' \
                    f'&FIELDS[EMAIL][0][VALUE_TYPE]=WORK' \
                    f'&FIELDS[PHONE][0][VALUE]={phone}' \
-                   f'&FIELDS[PHONE][0][VALUE_TYPE]=WORK'
+                   f'&FIELDS[PHONE][0][VALUE_TYPE]=WORK' \
+                   f'&FIELDS[COMPANY_TITLE]={name_company}' \
+                   f'&FIELDS[ADDRESS]={adress}' \
+                   f'&FIELDS[COMMENTS]={comment}'
+
 
     def do_json(self):
         if 'result' in self.response_json:
