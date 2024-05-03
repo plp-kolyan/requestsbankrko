@@ -229,15 +229,12 @@ class VTBLeadTestCase(TestCase):
     def setUp(self):
         self.json = {
             "leads": [
-                {
-                    "phone": "+79525798581",
-                    "consentOnPersonalDataProcessing": True,
-                    "inn": "6162088338",
-                    "city": "Каменск-Шахтинский",
-                    "productCode": "Payments",
-                    "sourceLeadId": "707463271",
-                    "companyName": 'ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ "АРАКС"'
-                },
+                {"inn": "550765347192",
+                 "city": "Омск",
+                 "phone": "79236765297",
+                 "productCode": "Payments",
+                 "sourceLeadId": "1633204779",
+                 "consentOnPersonalDataProcessing": True},
                 # {
                 #     "phone": "+7123456789",
                 #     "consentOnPersonalDataProcessing": True,

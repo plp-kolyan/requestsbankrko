@@ -283,7 +283,9 @@ class VTBFather(Aut, VTBBigFather):
                 'X-IBM-Client-Id': self.credits['client_id'].replace('@ext.vtb.ru', ''),
                 'Authorization': f'Bearer {self.get_token()}'
             }})
-        return super().get_response_production()
+        response = super().get_response_production()
+        time.sleep(1)
+        return response
 
 
 
@@ -347,7 +349,9 @@ class VTBLead(VTBFather):
                 'Authorization': f'Bearer {self.get_token()}'
             }})
         # return super().get_response_production()
-        return requests.request(**self.args_request)
+        response = requests.request(**self.args_request)
+        time.sleep(1)
+        return response
 
 
 class Open(RequestsGarantTestEndpoint):
