@@ -225,6 +225,13 @@ class VTBScoringTestCase(TestCase):
         print(obj.success)
 
 
+    def test_get_response_production(self):
+
+        obj = VTBScoring(self.json)
+        obj.args_request = {}
+        obj.get_response_production()
+
+
 class VTBLeadTestCase(TestCase):
     def setUp(self):
         self.json = {

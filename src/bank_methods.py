@@ -313,6 +313,9 @@ class VTBScoring(VTBFather):
                                                                  'Assembly reference is required.' or \
                         self.response_json['moreInformation'].find('<BackErr>') != -1:
                     self.resend_send = True
+            if 'error' in self.response_json:
+                if self.response_json['error'] == 'API Rate limit exceeded':
+                    self.resend_send = True
         return do_json_father
 
 
@@ -353,6 +356,14 @@ class VTBLead(VTBFather):
         time.sleep(1)
 
         return response
+
+    def do_json_success_authorization(self):
+        do_json_father = super().do_json_success_authorization()
+        if do_json_father is None:
+            if 'error' in self.response_json:
+                if self.response_json['error'] == 'API Rate limit exceeded':
+                    self.resend_send = True
+        return do_json_father
 
 
 class Open(RequestsGarantTestEndpoint):
