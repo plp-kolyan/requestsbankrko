@@ -50,8 +50,8 @@ class AlfaScoringTestCaset(TestCase):
     def setUp(self) -> None:
         self.key = os.environ.get('alfabank_dict_key')
         self.json = {
-            'organizationInfo': {'inn': '228394668965'},
-            "contactInfo": [{"phoneNumber": '79619912159'}],
+            'organizationInfo': {'inn': '7751312990'},
+            "contactInfo": [{"phoneNumber": '79154800289'}],
             "productInfo": [{"productCode": "LP_RKO"}]
         }
 

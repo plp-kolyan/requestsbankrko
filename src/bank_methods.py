@@ -316,6 +316,10 @@ class VTBScoring(VTBFather):
             if 'error' in self.response_json:
                 if self.response_json['error'] == 'API Rate limit exceeded':
                     self.resend_send = True
+
+            if 'errorMessage' in self.response_json:
+                if self.response_json['errorMessage'] == 'internal error. See log for details':
+                    self.resend_send = True
         return do_json_father
 
 
