@@ -336,6 +336,7 @@ class VTBLead(VTBFather):
         self.url += 'leads_impersonal'
 
     def define_json_response_test(self):
+        self.update_args_request()
         data = [{'leadId': lead['sourceLeadId'], 'status': 'NEW',
                  'sourceLeadId': lead['sourceLeadId'], 'responseCode': 'SUCCESS',
                  'responseCodeDescription': 'Операция выполнена успешно'} for lead in self.json['leads']]
@@ -349,12 +350,15 @@ class VTBLead(VTBFather):
             client_id = self.credits['client_id'].replace('@ext.vtb.ru', '')
         return client_id
 
-    def get_response_production(self):
+    def update_args_request(self):
         client_id = self.get_client_id()
         self.args_request.update({'headers': {
-                'X-IBM-Client-Id': client_id,
-                'Authorization': f'Bearer {self.get_token()}'
-            }})
+            'X-IBM-Client-Id': client_id,
+            'Authorization': f'Bearer {self.get_token()}'
+        }})
+
+    def get_response_production(self):
+        self.update_args_request()
         # return super().get_response_production()
         response = requests.request(**self.args_request)
         time.sleep(1)
@@ -871,7 +875,7 @@ class PSBParent(Aut, PSBall):
         return self.do_json_wrapper()
 
     def get_response_production(self):
-        self.args_request.update({'url': f'{self.url}?access-token={self.get_token()}'})
+        self.args_request.update({'url': f'{self.url}5555'})
         r = super().get_response_production()
         return r
 

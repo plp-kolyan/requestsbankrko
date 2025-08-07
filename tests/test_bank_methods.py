@@ -254,9 +254,10 @@ class VTBLeadTestCase(TestCase):
         }
 
     def test_get_rezult(self):
-        obj = VTBLead(self.json)
-        obj.custom_test = False
+        obj = VTBLead(self.json, True)
+        obj.custom_test = True
         obj.get_rezult()
+        print(obj.args_request)
         print(obj.rezult)
         self.assertEqual(obj.success, True)
         self.assertEqual(sorted([dict_client['sourceLeadId'] for dict_client in obj.rezult]),
@@ -1309,7 +1310,7 @@ class RaifazenTestCase(TestCase):
 
 class PSBTokenTestCase(TestCase):
     def test_0(self):
-        obj = PSBToken(True)
+        obj = PSBToken(False)
 
         print(obj.get_rezult())
 
