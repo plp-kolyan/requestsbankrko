@@ -16,3 +16,4 @@ __pycache__
 /tests/cityesjson/
 /proxies.json
 /VTBTokentwo.txt
+/cert_chain.pem

@@ -3,6 +3,7 @@ import os
 import time
 from datetime import timezone
 
+import certifi
 import requests
 from jsoncustom import JsonCustom
 from dotenv import load_dotenv, dotenv_values
@@ -150,9 +151,10 @@ class VTBBigFather(RequestsGarant):
         import urllib3
         urllib3.disable_warnings()
         super().__init__()
-
-        # self.cert = f'{os.path.abspath(os.curdir)}/src/certs.pem'
-        self.verify = False
+        self.verify = 'C:\\requestsbankrko\cert_chain.pem'
+        self.verify = f'{os.path.abspath(os.curdir)}/cert_chain.pem'
+        # self.cert = certifi.where()
+        # self.verify = False
         self.url = 'https://gw.api.vtb.ru:443/openapi/smb/lecs/lead-impers/v1/'
 
 
@@ -342,6 +344,7 @@ class VTBLead(VTBFather):
                  'responseCodeDescription': 'Операция выполнена успешно'} for lead in self.json['leads']]
 
         self.json_response_test = {"leads": data}
+
 
     def get_client_id(self):
         if self.tocken_two:
