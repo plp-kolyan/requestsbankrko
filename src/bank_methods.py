@@ -151,7 +151,7 @@ class VTBBigFather(RequestsGarant):
         import urllib3
         urllib3.disable_warnings()
         super().__init__()
-        self.verify = 'C:\\requestsbankrko\cert_chain.pem'
+
         self.verify = f'{os.path.abspath(os.curdir)}/cert_chain.pem'
         # self.cert = certifi.where()
         # self.verify = False

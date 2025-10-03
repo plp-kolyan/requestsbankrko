@@ -179,8 +179,7 @@ class VTBScoringTestCase(TestCase):
 
     def test_get_rezult(self):
         obj = VTBScoring(self.json)
-        with open('subca_ssl_rsa2024.crt', 'r') as file:
-            print(file.read())
+
         print(obj.get_rezult())
         # print(obj.exist_error_authorization())
 
