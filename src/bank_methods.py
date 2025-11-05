@@ -878,7 +878,7 @@ class PSBParent(Aut, PSBall):
         return self.do_json_wrapper()
 
     def get_response_production(self):
-        self.args_request.update({'url': f'{self.url}'})
+        self.args_request.update(f'{self.url}?access-token={self.get_token()}')
         r = super().get_response_production()
         return r
 
