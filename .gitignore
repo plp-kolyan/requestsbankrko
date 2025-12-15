@@ -14,3 +14,6 @@ __pycache__
 /PSBToken.txt
 /VTBToken.txt
 /tests/cityesjson/
+/proxies.json
+/VTBTokentwo.txt
+/cert_chain.pem

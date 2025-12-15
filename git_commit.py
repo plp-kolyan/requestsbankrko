@@ -10,7 +10,6 @@ def update_toml():
     if start_hash != hashlib.md5(open('pyproject.toml', 'rb').read()).hexdigest():
         return True
 
-
 def start():
     if update_toml() is True:
         os.system('git add .')

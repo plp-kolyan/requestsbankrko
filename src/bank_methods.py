@@ -1,6 +1,10 @@
+import json
 import os
 import time
 from datetime import timezone
+
+import certifi
+import requests
 from jsoncustom import JsonCustom
 from dotenv import load_dotenv, dotenv_values
 from requestsgarant import (
@@ -84,6 +88,7 @@ class AlfaStatusLead(Alfa):
 
 
 class AlfaScoring(Alfa):
+    dict_key = {'API-key': os.environ.get('alfabank_dict_key_old')}
     def __init__(self, json, test=test):
         super().__init__(test)
         self.json = json
@@ -146,15 +151,22 @@ class VTBBigFather(RequestsGarant):
         import urllib3
         urllib3.disable_warnings()
         super().__init__()
-        # self.cert = f'{os.path.abspath(os.curdir)}/src/certs.pem'
-        self.verify = False
+
+        self.verify = f'{os.path.abspath(os.curdir)}/cert_chain.pem'
+        # self.cert = certifi.where()
+        # self.verify = False
         self.url = 'https://gw.api.vtb.ru:443/openapi/smb/lecs/lead-impers/v1/'
 
 
 class Aut:
-    args_token_cls = ()
-    def __init__(self, token_cls, ERROR_AUT_KEY_VAL_CHOICES):
-        self.path_token = f'{os.path.abspath(os.curdir)}/{token_cls.__name__}.txt'.replace('venv\Lib\site-packages/', '')
+
+    def __init__(self, token_cls, ERROR_AUT_KEY_VAL_CHOICES, tocken_two=False, args_token_cls=()):
+        tocken_txt = token_cls.__name__
+        if tocken_two:
+            self.args_token_cls = args_token_cls
+            tocken_txt += 'two'
+        self.args_token_cls=args_token_cls
+        self.path_token = f'{os.path.abspath(os.curdir)}/{tocken_txt}.txt'.replace('venv\Lib\site-packages/', '')
         self.token_cls = token_cls
         self.ERROR_AUT_KEY_VAL_CHOICES = ERROR_AUT_KEY_VAL_CHOICES
 
@@ -165,9 +177,9 @@ class Aut:
                     return True
 
     def write_token(self):
-        token_obj = self.token_cls(*self.args_token_cls)
-        rezult = token_obj.get_rezult()
-        if token_obj.success is True:
+        self.token_obj = self.token_cls(*self.args_token_cls)
+        rezult = self.token_obj.get_rezult()
+        if self.token_obj.success is True:
             with open(self.path_token, 'w') as file:
                 file.write(rezult)
             return rezult
@@ -197,9 +209,16 @@ class Aut:
 
 
 class VTBToken(VTBBigFather):
-    def __init__(self):
+    def __init__(self, two_credits=False):
         super().__init__()
-        self.data = self.credits
+        self.data = self.credits.copy()
+        if two_credits:
+            self.data.update({
+                'client_id': os.environ.get('vtb_client_id_two'),
+                'client_secret': os.environ.get('vtb_client_secret_two')
+            })
+
+
 
         self.url = 'https://open.api.vtb.ru:443/passport/oauth2/token'
         self.method = 'post'
@@ -214,11 +233,17 @@ class VTBToken(VTBBigFather):
 
 
 class VTBFather(Aut, VTBBigFather):
+    ERROR_AUT_KEY_VAL_CHOICES = (
+        ('errorMessage', 'Internal error. See log for details'),
+        ('reason', 'Unauthorized'),
+        ('errorMessage', 'the header <Authorization> was not received in the request'),
+        ('error', 'key not authorized: no matching policy found')
+    )
+
     def __init__(self, json):
         VTBBigFather.__init__(self)
-        ERROR_AUT_KEY_VAL_CHOICES = (
-            ('reason', 'Unauthorized'), ('errorMessage', 'the header <Authorization> was not received in the request'))
-        Aut.__init__(self, VTBToken, ERROR_AUT_KEY_VAL_CHOICES)
+
+        Aut.__init__(self, VTBToken, self.ERROR_AUT_KEY_VAL_CHOICES)
         self.method = 'post'
         self.json = json
 
@@ -247,10 +272,11 @@ class VTBFather(Aut, VTBBigFather):
         return self.response_status_code
 
     def do_json_success_authorization(self):
-        if ('leads' in self.response_json) and ((self.response.status_code == 200)
+        if ('leads' in self.response_json) and ((self.response.status_code in [200, 400])
                 or "Некорректный ИНН." in str(self.response_json)):
             self.success = True
             return self.response_json['leads']
+
 
 
 
@@ -259,7 +285,10 @@ class VTBFather(Aut, VTBBigFather):
                 'X-IBM-Client-Id': self.credits['client_id'].replace('@ext.vtb.ru', ''),
                 'Authorization': f'Bearer {self.get_token()}'
             }})
-        return super().get_response_production()
+        response = super().get_response_production()
+        time.sleep(1)
+        return response
+
 
 
 class VTBStatusLead(VTBFather):
@@ -268,6 +297,8 @@ class VTBStatusLead(VTBFather):
         self.params = json
         self.url += 'leads'
         self.method = 'get'
+
+
 
 
 class VTBScoring(VTBFather):
@@ -284,22 +315,66 @@ class VTBScoring(VTBFather):
                                                                  'Assembly reference is required.' or \
                         self.response_json['moreInformation'].find('<BackErr>') != -1:
                     self.resend_send = True
+            if 'error' in self.response_json:
+                if self.response_json['error'] == 'API Rate limit exceeded':
+                    self.resend_send = True
+
+            if 'errorMessage' in self.response_json:
+                if self.response_json['errorMessage'] == 'internal error. See log for details':
+                    self.resend_send = True
         return do_json_father
 
 
+
+
 class VTBLead(VTBFather):
-    def __init__(self, json, test=test):
+    def __init__(self, json, test=test, tocken_two=False):
         super().__init__(json)
+
+        Aut.__init__(self, VTBToken, VTBFather.ERROR_AUT_KEY_VAL_CHOICES, tocken_two, (tocken_two,))
+        self.tocken_two = tocken_two
         self.test = test
         self.custom_test = True
         self.url += 'leads_impersonal'
 
     def define_json_response_test(self):
+        self.update_args_request()
         data = [{'leadId': lead['sourceLeadId'], 'status': 'NEW',
                  'sourceLeadId': lead['sourceLeadId'], 'responseCode': 'SUCCESS',
                  'responseCodeDescription': 'Операция выполнена успешно'} for lead in self.json['leads']]
 
         self.json_response_test = {"leads": data}
+
+
+    def get_client_id(self):
+        if self.tocken_two:
+            client_id = os.environ.get('vtb_client_id_two')
+        else:
+            client_id = self.credits['client_id'].replace('@ext.vtb.ru', '')
+        return client_id
+
+    def update_args_request(self):
+        client_id = self.get_client_id()
+        self.args_request.update({'headers': {
+            'X-IBM-Client-Id': client_id,
+            'Authorization': f'Bearer {self.get_token()}'
+        }})
+
+    def get_response_production(self):
+        self.update_args_request()
+        # return super().get_response_production()
+        response = requests.request(**self.args_request)
+        time.sleep(1)
+
+        return response
+
+    def do_json_success_authorization(self):
+        do_json_father = super().do_json_success_authorization()
+        if do_json_father is None:
+            if 'error' in self.response_json:
+                if self.response_json['error'] == 'API Rate limit exceeded':
+                    self.resend_send = True
+        return do_json_father
 
 
 class Open(RequestsGarantTestEndpoint):
@@ -615,7 +690,42 @@ class TochkaLeedRef(RequestsGarant):
 #         {"needcaptcha":1}
 # 'sitekey' : '6LcZ1zIUAAAAAIdX_hL_-LgO6OXS1nMEM8-E-E8m',
 
+class TochkaLeedRefProcces(RequestsGarant):
+    def __init__(self, json):
+        super().__init__()
+        self.data = json
 
+        self.headers = {
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Connection': 'keep-alive',
+            'Content-Length': '1809',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'Host': 'forms.tildacdn.com',
+            'Origin': 'https://partner.tochka.com',
+            'Referer': 'https://partner.tochka.com/',
+            'sec-ch-ua': '"Chromium";v="118", "Google Chrome";v="118", "Not=A?Brand";v="99"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'cross-site',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'
+
+        }
+        self.method = 'post'
+        self.url = 'https://forms.tildacdn.com/procces/'
+        # self.proxy = proxy
+        # self.proxies = {'https': f'http://{self.proxy}/'}
+        self.needcaptcha = False
+
+    def do_json(self):
+        if 'needcaptcha' in self.response_json:
+            self.needcaptcha = True
+        elif 'results' in self.response_json:
+            self.success = True
+            return str(self.response_json['results'])
 
 
 class MoeDelo(RequestsGarantTestHeaders):
@@ -772,6 +882,9 @@ class PSBParent(Aut, PSBall):
         r = super().get_response_production()
         return r
 
+    def do_json_wrapper(self):
+        return self.response_json
+
 
 class PSBScoring(PSBParent):
 
@@ -793,6 +906,37 @@ class PSBScoring(PSBParent):
                 return inn_busy
 
 
+class PSBdfmqueue(PSBParent):
+    def __init__(self, json_dict, test):
+        super().__init__(test)
+        self.json = json_dict
+        self.endpoint = f'/dfm/queue'
+        self.method = 'post'
+
+    def do_json_wrapper(self):
+        queue_id = self.response_json.get('queue_id')
+        if queue_id is not None:
+            self.success = True
+            return queue_id
+
+
+
+class PSBdfmqueueid(PSBParent):
+    def __init__(self, id, test):
+        super().__init__(test)
+        self.method = 'get'
+        self.endpoint = f'/dfm/queue/{id}'
+        self.in_que = False
+
+    def do_json_wrapper(self):
+        status, data = (self.response_json.get(key) for key in ['status', 'data'])
+
+        if status == 'завершено' and isinstance(data, list):
+            self.success = True
+            return data
+
+        elif status == 'в обработке':
+            self.in_que = True
 
 
 
@@ -902,3 +1046,32 @@ class KonturProspectiveSales(Kontur):
         return self.prospective_sale_id
 
 
+def mutation_inn(inn: str):
+    inn = str(inn)
+    if len(inn) in [9, 11]:
+        inn = '0' + inn
+    return inn
+
+class Kombinator(RequestsGarant):
+    kombinator_secret = os.environ.get('kombinator_secret')
+    def __init__(self, surname, first_name, patronomic, phone, mail, name_company, adress, comment, test):
+        super().__init__()
+        self.method = 'get'
+
+        self.url = f'https://enterra.bitrix24.ru/rest/1/{self.kombinator_secret}' \
+                   f"/crm.lead.add.json?FIELDS[TITLE]={'Тестовая заявка' if test else surname + ' ' + first_name + ' ' +patronomic}" \
+                   f'&FIELDS[NAME]={first_name}' \
+                   f'&FIELDS[LAST_NAME]={surname}' \
+                   f'&FIELDS[EMAIL][0][VALUE]={mail}' \
+                   f'&FIELDS[EMAIL][0][VALUE_TYPE]=WORK' \
+                   f'&FIELDS[PHONE][0][VALUE]={phone}' \
+                   f'&FIELDS[PHONE][0][VALUE_TYPE]=WORK' \
+                   f'&FIELDS[COMPANY_TITLE]={name_company}' \
+                   f'&FIELDS[ADDRESS]={adress}' \
+                   f'&FIELDS[COMMENTS]={comment}'
+
+
+    def do_json(self):
+        if 'result' in self.response_json:
+            self.success = True
+            return self.response_json['result']

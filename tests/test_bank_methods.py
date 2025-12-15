@@ -50,8 +50,8 @@ class AlfaScoringTestCaset(TestCase):
     def setUp(self) -> None:
         self.key = os.environ.get('alfabank_dict_key')
         self.json = {
-            'organizationInfo': {'inn': '6685003097'},
-            "contactInfo": [{"phoneNumber": '79600417480'}],
+            'organizationInfo': {'inn': '7751312990'},
+            "contactInfo": [{"phoneNumber": '79154800289'}],
             "productInfo": [{"productCode": "LP_RKO"}]
         }
 
@@ -68,8 +68,11 @@ class AlfaScoringTestCaset(TestCase):
     def test_get_rezult_false(self):
         obj = AlfaScoring(self.json, False)
         obj.get_rezult()
-        self.assertEqual(obj.success, True)
+        print(obj.args_request)
         print(obj.response)
+        print(obj.response_json)
+        self.assertEqual(obj.success, True)
+
         self.assertIn(obj.rezult, ['Свободен', 'Занят'])
 
     def test_get_rezult_true(self):
@@ -84,17 +87,17 @@ class AlfaLeadTestCase(TestCase):
         self.key = os.environ.get('alfabank_dict_key')
         self.json = {
             'organizationInfo': {
-                'organizationName': 'ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ "ВЕЛ-ТОРГ"',
-                'inn': '9725074920',
+                'organizationName': 'ИНДИВИДУАЛЬНЫЙ ПРЕДПРИНИМАТЕЛЬ КАНДАУРОВ ИВАН СЕРГЕЕВИЧ',
+                'inn': '272292625949',
             },
             'contactInfo': [{
-                "fullName": 'РОМАНОВ НИКОЛАЙ ВАСИЛЬЕВИЧ',
-                "phoneNumber": '79771036772',
+                "fullName": 'КАНДАУРОВ ИВАН СЕРГЕЕВИЧ',
+                "phoneNumber": '79242015525',
             }
             ],
             "requestInfo": {
                 "comment": '',
-                "cityCode": '9fdcc25f-a3d0-4f28-8b61-40648d099065'
+                "cityCode": '298e0b86-950a-4df9-b975-204964f6ed5a'
             },
             "productInfo": [{"productCode": "LP_RKO"}]
         }
@@ -115,10 +118,11 @@ class AlfaLeadTestCase(TestCase):
         self.assertEqual(obj.args_request['headers']['API-key'], 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa')
 
     def test_get_rezult(self):
-        obj = AlfaLead(self.json, True)
+        obj = AlfaLead(self.json, False)
         obj.get_rezult()
         self.assertEqual(obj.success, True)
         print(obj.rezult)
+        print(obj.response_json)
         self.assertRegex(obj.rezult,
                          r'^[a-zA-Z0-9]{8}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{4}-[a-zA-Z0-9]{12}')
 
@@ -157,9 +161,7 @@ class VTBStatusLeadTestCase(TestCase):
 
 class VTBScoringTestCase(TestCase):
     def setUp(self):
-        self.json = {
-            "leads": [{"inn": "9721194775", "productCode": "Payments"}, {"inn": "780448824307", "productCode": "Payments"}, {"inn": "540317272444", "productCode": "Payments"}, {"inn": "661908324831", "productCode": "Payments"}, {"inn": "665800616459", "productCode": "Payments"}, {"inn": "665802770417", "productCode": "Payments"}]
-        }
+        self.json =  {"leads": [{"inn": "5262392611", "productCode": "Payments"}, {"inn": "5249180784", "productCode": "Payments"}, {"inn": "7456053403", "productCode": "Payments"}]}
 
     # def test_test(self):
     #     obj = VTBScoring(self.json)  #
@@ -177,6 +179,7 @@ class VTBScoringTestCase(TestCase):
 
     def test_get_rezult(self):
         obj = VTBScoring(self.json)
+
         print(obj.get_rezult())
         # print(obj.exist_error_authorization())
 
@@ -191,7 +194,7 @@ class VTBScoringTestCase(TestCase):
         obj = VTBScoring(self.json)
         obj.response_json = {'httpCode': '401', 'httpMessage': 'Unauthorized',
                              'moreInformation': "<BackErr> needConfirm"}
-        obj.do_json()
+        print(obj.do_json())
         self.assertEqual(obj.success, True)
         self.assertEqual(sorted([dict_client['inn'] for dict_client in obj.rezult]),
                          sorted([json['inn'] for json in self.json['leads']]))
@@ -206,20 +209,135 @@ class VTBScoringTestCase(TestCase):
         self.assertEqual(sorted([dict_client['inn'] for dict_client in obj.rezult]),
                          sorted([json['inn'] for json in self.json['leads']]))
 
+    def test_err(self):
+        obj = VTBScoring(self.json)
+        print(obj.__dict__)
+        obj.response_json = {'leads': [{'inn': '7456053403', 'productCode': 'Payments', 'responseCode': 'NEGATIVE', 'responseCodeDescription': 'Лид не будет взят в работу'}, {'inn': '5262392611', 'productCode': 'Payments', 'responseCode': 'NEGATIVE', 'responseCodeDescription': 'Лид не будет взят в работу'}, {'inn': '5249180784', 'productCode': 'Payments', 'responseCode': 'NEGATIVE', 'responseCodeDescription': 'Лид не будет взят в работу'}]}
+        obj.do_json()
+        print(obj.rezult)
+        # self.assertEqual(obj.success, True)
+        # self.assertEqual(sorted([dict_client['inn'] for dict_client in obj.rezult]),
+        #                  sorted([json['inn'] for json in self.json['leads']]))
+
+    def test_response(self):
+        obj = VTBScoring(self.json)
+        print(obj.get_rezult())
+        print(obj.response.status_code)
+        print(obj.success)
+
+
+    def test_get_response_production(self):
+
+        obj = VTBScoring(self.json)
+        obj.args_request = {}
+        obj.get_response_production()
+
+
+class DevTest(TestCase):
+    def test_0(self):
+        json = {"leads": [{"inn": "5262392611", "productCode": "Payments"},
+                          {"inn": "5249180784", "productCode": "Payments"},
+                          {"inn": "7456053403", "productCode": "Payments"}]}
+
+        response = requests.post(
+            'https://gw.api.vtb.ru:443/openapi/smb/lecs/lead-impers/v1/check_leads',
+            json=json,
+            headers=''
+                      )
+
+    def test_1(self):
+        print(certifi.where())
+
+    def test_2(self):
+        cert_chain = """
+        -----BEGIN CERTIFICATE-----
+        MIIG6DCCBNCgAwIBAgICEAUwDQYJKoZIhvcNAQELBQAwcDELMAkGA1UEBhMCUlUx
+        PzA9BgNVBAoMNlRoZSBNaW5pc3RyeSBvZiBEaWdpdGFsIERldmVsb3BtZW50IGFu
+        ZCBDb21tdW5pY2F0aW9uczEgMB4GA1UEAwwXUnVzc2lhbiBUcnVzdGVkIFJvb3Qg
+        Q0EwHhcNMjQwNzE1MTI1MDQxWhcNMjkwNzE5MTI1MDQxWjBvMQswCQYDVQQGEwJS
+        VTE/MD0GA1UECgw2VGhlIE1pbmlzdHJ5IG9mIERpZ2l0YWwgRGV2ZWxvcG1lbnQg
+        YW5kIENvbW11bmljYXRpb25zMR8wHQYDVQQDDBZSdXNzaWFuIFRydXN0ZWQgU3Vi
+        IENBMIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA1j0rkZECOt1S8o7I
+        JY+4YKAxuEa5xaHKHXT2EpkuC/0krqMOjUy2oPIRNgR5g8X0Jl6jamxeGLc4Q1tf
+        ju6or9oSRYThIUhRsFDQNBiBBEXoBgWxTfiKB2eyT97+pz5TBtBiRCPaLGRHYLRb
+        9Jz2HkJlxbtNPjtDrF5DPHym+mZ1M1z3hIQYAqJwLpsEBnsw/VxWMlxqHoeewd0h
+        uJMd71KQ5vOKlz7KrIZ6EobNNa6wItuvsfj3kYCK7O78uLHGXXFxdr8Hae9lMUmC
+        8F7AFwa+bO1LRlTlqW7rE3rLf+jj70N01N8T3o22v14YBaFBWQWncAVYD2JuL3tH
+        252+kdNOERf1fLbLRigJAbd+hOhWYlNf963TFDgnNPliHNIW72SygVBnI2V3JwO1
+        dp1hVKpK/zt8ziGdHW4gmOLTsH50YKdR4jNqUgQv4wASlKn9OpN6zHYc5G8h86fY
+        BM+zxE5ikGI+I/vIqBuI0eaDU92AWN/YjFLpu8tMu9kLRSCf1vug6FIfDPWVo7iP
+        ac/SI2v8jnnpaW7ph/Pz3WkzaG7ZZJsfFs+8dploWc6LOoDtbFBhMdGMxu024msC
+        0PSjZb5ODXPIaO2NsA7fMiAtZcoK6anTUJh4zOP/stA9qsJGNxdrEmiPXSmBZY/N
+        Y0wkZgZ6JTDhw7038bPvctkblJkCAwEAAaOCAYswggGHMB0GA1UdDgQWBBR3Pdk5
+        r0K93FvKduru/c4+YSkwXzAfBgNVHSMEGDAWgBTh0YHlzlpfBKrS6badZrHF+qws
+        hzAOBgNVHQ8BAf8EBAMCAYYwEgYDVR0TAQH/BAgwBgEB/wIBADCBmAYIKwYBBQUH
+        AQEEgYswgYgwQAYIKwYBBQUHMAKGNGh0dHA6Ly9udWMtY2RwLnZvc2tob2QucnUv
+        Y2RwL3Jvb3RjYV9zc2xfcnNhMjAyMi5jcnQwRAYIKwYBBQUHMAKGOGh0dHA6Ly9u
+        dWMtY2RwLmRpZ2l0YWwuZ292LnJ1L2NkcC9yb290Y2Ffc3NsX3JzYTIwMjIuY3J0
+        MIGFBgNVHR8EfjB8MDqgOKA2hjRodHRwOi8vbnVjLWNkcC52b3NraG9kLnJ1L2Nk
+        cC9yb290Y2Ffc3NsX3JzYTIwMjIuY3JsMD6gPKA6hjhodHRwOi8vbnVjLWNkcC5k
+        aWdpdGFsLmdvdi5ydS9jZHAvcm9vdGNhX3NzbF9yc2EyMDIyLmNybDANBgkqhkiG
+        9w0BAQsFAAOCAgEAmsINXtQ7wwUWvIeOr80MdJS/5G4xhyZOVEmeUorThquT672y
+        cCg3XCxc4fwbiZqSSbBqntQ7RtiTAKMYMvBageKoVHbzz+R4jX01tKcTx8cDePrz
+        dJ73bLNUorE7RU9QsW4KyiUeRmjMDV23AUlEvuQFTwgkHXvbac1BBdPn9CrssQuF
+        5EGohZKcQPFiAAc4SHbRNhlr7uAwgpc/erzI9EAcvA6BVAXcVKoeGpV01uexUgZ6
+        St5RP9UmDWNA7T4yVXWJ233N0Q8bl+6AswINQ3PosPu6yQQHQjr65YS06epK+AeI
+        6j+oGR4xI7EhTQhQvaobnGmX/8QQ7XDRYCP2HXYxiffnn/CfZ/BVyKLYeY1ZipjE
+        nzqdQIC2+Q3WtY8jsVRQMP38WFRmtsIt5snehnPTs5bKGVIcYzj3o3Ex/K7agEz0
+        zAJ0JR5ivXZOvNkT0g9x1v+S1IkU3e/nX1a+tpRquMtnHX0L2lXArNHUbaOO9EJt
+        d57WaIpofV5cVhhwShOgAuBc9UMJF3/n4t4RKiPxtsK8P67gcmphMhslj7AMYrYM
+        ej2NvQZY4m3ub3CPC/PrTjDONvb+8g5xrKtxBjYqC74HSB4dg9G3WimSDUuP2Su6
+        G2y2TUeyJuCvCLz289VoO0vg7cNdMobE3KCqAiiNhN2VBFxHAUKmUoRcRdw=
+        -----END CERTIFICATE-----
+        -----BEGIN CERTIFICATE-----
+        MIIFwjCCA6qgAwIBAgICEAAwDQYJKoZIhvcNAQELBQAwcDELMAkGA1UEBhMCUlUx
+        PzA9BgNVBAoMNlRoZSBNaW5pc3RyeSBvZiBEaWdpdGFsIERldmVsb3BtZW50IGFu
+        ZCBDb21tdW5pY2F0aW9uczEgMB4GA1UEAwwXUnVzc2lhbiBUcnVzdGVkIFJvb3Qg
+        Q0EwHhcNMjIwMzAxMjEwNDE1WhcNMzIwMjI3MjEwNDE1WjBwMQswCQYDVQQGEwJS
+        VTE/MD0GA1UECgw2VGhlIE1pbmlzdHJ5IG9mIERpZ2l0YWwgRGV2ZWxvcG1lbnQg
+        YW5kIENvbW11bmljYXRpb25zMSAwHgYDVQQDDBdSdXNzaWFuIFRydXN0ZWQgUm9v
+        dCBDQTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAMfFOZ8pUAL3+r2n
+        qqE0Zp52selXsKGFYoG0GM5bwz1bSFtCt+AZQMhkWQheI3poZAToYJu69pHLKS6Q
+        XBiwBC1cvzYmUYKMYZC7jE5YhEU2bSL0mX7NaMxMDmH2/NwuOVRj8OImVa5s1F4U
+        zn4Kv3PFlDBjjSjXKVY9kmjUBsXQrIHeaqmUIsPIlNWUnimXS0I0abExqkbdrXbX
+        YwCOXhOO2pDUx3ckmJlCMUGacUTnylyQW2VsJIyIGA8V0xzdaeUXg0VZ6ZmNUr5Y
+        Ber/EAOLPb8NYpsAhJe2mXjMB/J9HNsoFMBFJ0lLOT/+dQvjbdRZoOT8eqJpWnVD
+        U+QL/qEZnz57N88OWM3rabJkRNdU/Z7x5SFIM9FrqtN8xewsiBWBI0K6XFuOBOTD
+        4V08o4TzJ8+Ccq5XlCUW2L48pZNCYuBDfBh7FxkB7qDgGDiaftEkZZfApRg2E+M9
+        G8wkNKTPLDc4wH0FDTijhgxR3Y4PiS1HL2Zhw7bD3CbslmEGgfnnZojNkJtcLeBH
+        BLa52/dSwNU4WWLubaYSiAmA9IUMX1/RpfpxOxd4Ykmhz97oFbUaDJFipIggx5sX
+        ePAlkTdWnv+RWBxlJwMQ25oEHmRguNYf4Zr/Rxr9cS93Y+mdXIZaBEE0KS2iLRqa
+        OiWBki9IMQU4phqPOBAaG7A+eP8PAgMBAAGjZjBkMB0GA1UdDgQWBBTh0YHlzlpf
+        BKrS6badZrHF+qwshzAfBgNVHSMEGDAWgBTh0YHlzlpfBKrS6badZrHF+qwshzAS
+        BgNVHRMBAf8ECDAGAQH/AgEEMA4GA1UdDwEB/wQEAwIBhjANBgkqhkiG9w0BAQsF
+        AAOCAgEAALIY1wkilt/urfEVM5vKzr6utOeDWCUczmWX/RX4ljpRdgF+5fAIS4vH
+        tmXkqpSCOVeWUrJV9QvZn6L227ZwuE15cWi8DCDal3Ue90WgAJJZMfTshN4OI8cq
+        W9E4EG9wglbEtMnObHlms8F3CHmrw3k6KmUkWGoa+/ENmcVl68u/cMRl1JbW2bM+
+        /3A+SAg2c6iPDlehczKx2oa95QW0SkPPWGuNA/CE8CpyANIhu9XFrj3RQ3EqeRcS
+        AQQod1RNuHpfETLU/A2gMmvn/w/sx7TB3W5BPs6rprOA37tutPq9u6FTZOcG1Oqj
+        C/B7yTqgI7rbyvox7DEXoX7rIiEqyNNUguTk/u3SZ4VXE2kmxdmSh3TQvybfbnXV
+        4JbCZVaqiZraqc7oZMnRoWrXRG3ztbnbes/9qhRGI7PqXqeKJBztxRTEVj8ONs1d
+        WN5szTwaPIvhkhO3CO5ErU2rVdUr89wKpNXbBODFKRtgxUT70YpmJ46VVaqdAhOZ
+        D9EUUn4YaeLaS8AjSF/h7UkjOibNc4qVDiPP+rkehFWM66PVnP1Msh93tc+taIfC
+        EYVMxjh8zNbFuoc7fzvvrFILLe7ifvEIUqSVIC/AzplM/Jxw7buXFeGP1qVCBEHq
+        391d/9RAfaZ12zkwFsl+IKwE/OZxW8AHa9i1p4GO0YSNuczzEm4=
+        -----END CERTIFICATE-----
+        """
+        with open('cert_chain.pem', 'w') as f:
+            f.write(cert_chain)
+
+
 
 class VTBLeadTestCase(TestCase):
     def setUp(self):
         self.json = {
             "leads": [
-                {
-                    "phone": "+79525798581",
-                    "consentOnPersonalDataProcessing": True,
-                    "inn": "6162088338",
-                    "city": "Каменск-Шахтинский",
-                    "productCode": "Payments",
-                    "sourceLeadId": "707463271",
-                    "companyName": 'ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ "АРАКС"'
-                },
+                {"inn": "550765347192",
+                 "city": "Омск",
+                 "phone": "79236765297",
+                 "productCode": "Payments",
+                 "sourceLeadId": "1633204779",
+                 "consentOnPersonalDataProcessing": True},
                 # {
                 #     "phone": "+7123456789",
                 #     "consentOnPersonalDataProcessing": True,
@@ -232,9 +350,10 @@ class VTBLeadTestCase(TestCase):
         }
 
     def test_get_rezult(self):
-        obj = VTBLead(self.json)
-        obj.custom_test = False
+        obj = VTBLead(self.json, True)
+        obj.custom_test = True
         obj.get_rezult()
+        print(obj.args_request)
         print(obj.rezult)
         self.assertEqual(obj.success, True)
         self.assertEqual(sorted([dict_client['sourceLeadId'] for dict_client in obj.rezult]),
@@ -280,6 +399,32 @@ class VTBLeadTestCase(TestCase):
         print(obj.response.status_code)
         print(obj.success)
         print(obj.resend_send)
+
+    def test_tocken_txt(self):
+        obj = VTBLead(self.json, True, 'VTBToken2')
+        print(obj.__dict__)
+        print(obj.__dict__['path_token'])
+
+    def test_tocken_obj(self):
+        obj = VTBLead(self.json, True, 'VTBToken2')
+        token_obj = obj.token_cls()
+        print(token_obj.__dict__['credits'])
+
+    def test_vtb_tocken(self):
+        obj = VTBLead(self.json, True, False)
+        obj.write_token()
+
+        print(obj.path_token)
+        print(obj.token_obj.args_request)
+        print(obj.token_obj.rezult)
+
+        print(obj.get_client_id())
+        print(obj.get_token())
+
+    def test_vtb_response(self):
+        obj = VTBLead(self.json, True, False)
+        print(obj.get_rezult())
+
 
 
 
@@ -378,7 +523,7 @@ class TestTochkaLeedRef(TestCase):
 
         self.json = {
                 'formservices[]': 'c1dbed398635e5729a7f32d17aeb88de',
-                'phone': '+7 (927) 571-4003',
+                'phone': '+7 (924) 163-1756',
                 'advid': 'kckireev',
                 'page_description': 'Заявку оставили за клиента сотрудники партнёра. Обычное предложение РКО.',
 
@@ -386,8 +531,9 @@ class TestTochkaLeedRef(TestCase):
 
                 'page_url': 'partner.tochka.com/fp/',
 
-                'inn': '3000003670',
-                'comment': 'ТЕСТОВАЯ ЗАЯВКА',
+                # 'inn': '3000003670',
+                'inn': '027007704717',
+                'comment': 'АЛЬСИНА',
                 'crm_type': 'signup',
                 'gclid': '',
                 'form-spec-comments': '',
@@ -408,6 +554,15 @@ class TestTochkaLeedRef(TestCase):
                 }
 
 
+
+    def test_two_key(self):
+        d = {
+            'formservices[]': '0fbed463800a41e46b1701815e7de89d',
+            'formservices[]': 'cce79d01ee38caf45a0e1bb6cf8253bc'
+        }
+        print(d)
+
+
     def test_get_rezult(self):
         self.obj = TochkaLeedRef(self.json)
         print(self.obj.get_rezult())
@@ -417,26 +572,23 @@ class TestTochkaLeedRef(TestCase):
     def test_0(self):
         print(get_recaptcha_v2('47.241.165.133:443'))
 
+    def test_open(self):
+        with open('tests/proxies.txt', 'r') as file:
+            print(file.read().splitlines())
+
     def test_1(self):
-        proxies_list = ["154.26.134.214:80", "154.26.134.217:80", "47.241.165.133:443", "15.235.150.136:80", "47.74.152.29:8888",
-         "174.138.24.67:8080", "112.140.186.124:808", "118.107.44.181:80", "118.107.44.181:8000", "45.12.31.35:80",
-         "45.14.174.110:80", "141.101.120.156:80", "172.67.208.171:80", "23.227.38.11:80", "203.34.28.8:80",
-         "203.22.223.136:80", "203.30.191.227:80", "185.162.229.41:80", "185.162.231.6:80", "203.23.106.75:80",
-         "203.23.103.12:80", "45.8.107.166:80", "203.28.9.225:80", "203.23.103.57:80", "203.24.108.96:80",
-         "203.13.32.213:80", "185.162.231.163:80", "45.8.106.205:80", "203.24.109.184:80", "203.28.9.118:80",
-         "185.162.229.171:80", "203.13.32.137:80", "45.12.30.121:80", "45.8.106.110:80", "203.13.32.72:80",
-         "185.162.228.83:80", "203.30.190.49:80", "203.34.28.245:80", "203.28.9.201:80", "203.32.120.98:80",
-         "203.24.109.181:80", "45.14.174.63:80", "203.32.120.153:80", "203.13.32.63:80", "45.8.107.143:80",
-         "185.162.229.237:80", "141.193.213.179:80", "172.67.185.188:80", "185.238.228.171:80", "185.238.228.144:80",
-         "172.67.55.32:80", "141.101.121.44:80", "141.101.121.12:80", "141.101.122.64:80", "141.101.122.111:80",
-         "172.67.165.253:80", "172.67.253.207:80", "172.67.70.50:80", "172.67.23.197:80", "172.67.180.8:80",
-         "45.12.31.190:80", "203.24.109.202:80", "203.13.32.166:80", "45.8.107.49:80"]
+        import time
+        with open('tests/proxies.txt', 'r') as file:
+            proxies_list = file.read().splitlines()
+
 
 
         print(len(proxies_list))
         for proxy in proxies_list:
-            ob = TochkaLeedRef(self.json, proxy).get_obj_rezult()
+            self.proxies = {'https': f'http://{proxy}/'}
+            ob = TochkaLeedRef(self.json).get_obj_rezult()
             print(f"{ob.rezult} == {proxy}")
+            time.sleep(1)
         #     if ob.success:
         #         print(f'{proxy} - рабочий')
         #         break
@@ -446,6 +598,83 @@ class TestTochkaLeedRef(TestCase):
         proxy = '47.241.165.133:443'
         ob = TochkaLeedRef(self.json, proxy).get_obj_rezult()
         print(ob.rezult)
+
+
+class TestTochkaLeedRefProcces(TestCase):
+    def setUp(self) -> None:
+        self.json = {
+            'formservices[]': '6d11056b82427faadcecf14ad36dcd17',
+            'phone': '+7 (914) 692-6084',
+            # 'inn': '222210923416',
+            'advid': 'kckireev',
+            'yandex_uid': '',
+            'page_description': 'Заявка на счёт',
+            'page_url': 'partner.tochka.com/',
+            'gclid': '',
+            'crm_type': 'signup',
+            'form-spec-comments': '',
+            'tildaspec - referer': 'https://partner.tochka.com/?referer1=kckireev#form',
+            'tildaspec-formid': 'form527521569',
+            'tildaspec-formskey': '8e01b006ad02c72decfea4d870db663d',
+            'tildaspec-version-lib': '02.001',
+            'tildaspec-pageid': 2727052,
+            'tildaspec-projectid': 650828,
+            'tildaspec-lang': 'RU',
+            'tildaspec-fp': 'st5068w1318h963ft288.593755068'
+
+
+        }
+
+    def test_1(self):
+        print(TochkaLeedRefProcces(self.json).get_rezult())
+
+    def test_2(self):
+        import time
+        with open('tests/proxies.txt', 'r') as file:
+            proxies_list = file.read().splitlines()
+
+
+
+        print(len(proxies_list))
+        for proxy in proxies_list:
+
+            ob = TochkaLeedRefProcces(self.json)
+            ob.proxies = {'https': f'http://{proxy}/'}
+            ob.get_obj_rezult()
+            print(f"{ob.rezult} == {proxy}")
+            time.sleep(1)
+
+    def test_3(self):
+        ob = TochkaLeedRefProcces(self.json)
+        ob.proxies = {'https': f'http://L8DNeA:Y9ZYT9@38.153.31.120:9322/'}
+        ob.get_obj_rezult()
+        print(f"{ob.rezult} == {ob.args_request}")
+
+    def test_5(self):
+
+        with open('proxies.json', 'w', encoding='utf-8') as file:
+            json.dump({
+    "L8DNeA:Y9ZYT9@38.153.31.120:9322":
+      {
+        "time": 0,
+        "no_ban": True,
+      },
+    "static":
+      {
+        "time": 0,
+        "no_ban": True,
+      }
+}, file, indent=4, ensure_ascii=False)
+
+        print(time.time())
+
+    def test_do_json(self):
+        with open('proxies.json', 'r', encoding='utf-8') as file:
+            print(json.load(file))
+
+    def test_6(self):
+        pass
+
 
 
 class TochkaRegistryUrTestCase(TestCase):
@@ -928,7 +1157,7 @@ class AlfaCityTestCase(TestCase):
 class VTBtokenTestCase(TestCase):
     def setUp(self):
         self.obj = VTBToken()
-        print(self.obj.cert)
+
 
     def test_get_rezult(self):
         print(self.obj.path_vtb_token)
@@ -1107,7 +1336,8 @@ class TokenTestCase(TestCase):
         print(self.obj.get())
 
     def test_2(self):
-        print(self.obj.write())
+        print(self.obj.args_token_cls)
+        # print(self.obj.write_token())
 
 
 
@@ -1176,14 +1406,14 @@ class RaifazenTestCase(TestCase):
 
 class PSBTokenTestCase(TestCase):
     def test_0(self):
-        obj = PSBToken(True)
+        obj = PSBToken(False)
 
         print(obj.get_rezult())
 
 
     def test_1(self):
         # {'code': 404, 'status': 'NOT_EXISTS', 'message': 'Создание заявки с данным ИНН разрешено'}
-        test = True
+        test = False
 
 
         inns = ["6382094062", "5007117617", "9705184265", "4705097662", "7734465242", "7813668661", "6320072051", "9719031558", "9723172375", "9704171432", "9725098952", "9725098960", "9725099000", "9725099032", "9703113607", "9727011971", "9726024618", "9704171601", "9728076523", "9727011925", "9727011932", "9728076587", "9701224453", "9701224478", "9728076594", "9727011989", "9729331977", "9725098977", "9705180415", "9726024590", "9727011940", "9727011957", "9728076604", "9729331952", "9727012012", "9725098945", "9726024583", "9728076611", "9718205890", "9703113597", "9727011918", "9706027434", "5009133639", "5262389062", "5032348840", "5029273458", "5075041684", "5018213256", "1684009258", "700006760", "5032348858", "5045069026", "3513003845", "1832165912", "1831207863", "5906175062", "1655489708", "1683010476", "1684009265", "1650418887", "5257212077", "1685008190", "3527024852", "5031148849", "9724109591", "5031148831", "5017130695", "5027311838", "1674003480", "1675001816", "6168118814", "1685008144", "5017130688", "5263150855", "5906175055", "1674003465", "1655489715", "5031148856", "1686020850", "1686020835", "1655489698", "5260487674", "3700000844", "5003154230", "5040182162", "3521007120", "3522004919", "5005072569", "1655489578", "1685008151", "5018213249", "5012108960", "3100009700", "9102286098", "1832165920", "5044137481", "1644101338", "1655489641", "1673003293", "9408000035"]
@@ -1194,6 +1424,7 @@ class PSBTokenTestCase(TestCase):
 
 
             print(obj_s.get_rezult())
+            print(obj_s.args_request)
             # print(obj_s.response_status_code)
             # print(obj_s.response.text)
             # print(obj_s.response.headers)
@@ -1388,3 +1619,122 @@ class KonturTestCase(TestCase):
 
         # }
         print(KonturProspectiveSales(json, True).get_rezult())
+
+class Kontur(TestCase):
+    '''
+:authority:
+elba.kontur.ru
+:method:
+POST
+:path:
+/PublicInterface/Registration/SpecialPartnerRegistration/Register?utm_referer=www.google.com&utm_source=google&utm_medium=organic&utm_startpage=kontur.ru%2Felba&utm_orderpage=kontur.ru%2Felba&from=kontur.ru-registration&back=https%3a%2f%2fkontur.ru%2f&p=w19854
+:scheme:
+https
+Accept:
+text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+Accept-Encoding:
+gzip, deflate, br
+Accept-Language:
+ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7
+Cache-Control:
+max-age=0
+Content-Length:
+66
+Content-Type:
+application/x-www-form-urlencoded
+Cookie:
+ngtoken=LhHOC2TtrPlfmzgGM0MIAg==; _gcl_au=1.1.1529092860.1693297916; _ym_uid=1693297916574829336; _ym_d=1693297916; tmr_lvid=6042c49263bcdeb02a1fed45bcf48e68; tmr_lvidTS=1693297916595; adtech_uid=f1449c65-747b-4d8a-a4d6-9523e25632ab%3Akontur.ru; top100_id=t1.7709112.1458336977.1693297916706; sr_singular=45b9fa5d-bf37-47d1-92c9-0f2416f8b946; _gid=GA1.2.768594663.1693471363; _ym_isad=2; device=f4adb4616ab33c0205a58aeea391192a.Q0JFMUVERkItRTkwRi00Q0NELUFEN0EtRDIxQUQxNDdENDlD.60c5853ae810e85401d7d7194a46f565d90a3f9b83e4f6c445016eb171a6dd2b; token=djnDp40Uq44g1Mr0fBd5tjYIz6G1HBQE6+tiijkxwn2rkSS55gRzZVY8a1yD40nsKxC13IvYu7kIi9HYkRe0XsE6kCzdhWNaaFgAn3/n2Dlo8VIMV2Xf+MJ1Waw2h5uh; auth.check=281225CA4A3D456AA50FAD952D498E3229D65B1C30BB8348D3C753F38F549D71; portaluserid=cb82dba5-4491-4437-aa5b-689f6486c4d7; auth.sid=A5DB82CB91443744AA5B689F6486C4D7980C2BAA8C4D4D4B9B6575D70F3E98DC; kontur.ru-go-product-bk=1; kontur.ru-go-product-elba=1; originalReferer=kontur.ru; elba_c=OuJsn3DRZahjID1E5af6ylSRasE3OfijByw38yGa31Y=; trafficSourceId=1ac3c2c3-ff68-4c3a-a125-51f03de22d01; __elbaRequestVerificationToken=7AU6Ym4Xr_eoQ12Rk1V1rLb4usnnQKzxz_KHFw411lPJm2UJgaIA3XETFyDDWZ9DCS4EeFx0JqWXQLIRvad8j1uekoA1; _ga=GA1.3.1085211295.1693297916; _gid=GA1.3.768594663.1693471363; elba_a=elba; route=89c2c360-8a27-4527-b42d-92572da396a0; elbaRoute=WIN-ELBA6:80; browserInfoSaved=true; _mfp=f2a3e300d8027a060c63e816d142fcc5; _ym_visorc=w; _ga_K1PCLBF82L=GS1.1.1693489557.2.1.1693489817.59.0.0; elba_s=6MaDLjZH/oebqLDkGwzd7O88ju34PPQ7F03lkKVsQI/dc/5yVREgF8AWuOqZjIDNE4KLJIQfTh+eb2pL4bDkFQ==; _gat=1; last_visit=1693464715188%3A%3A1693489915188; _ga=GA1.2.1085211295.1693297916; _dc_gtm_UA-1690345-1=1; _ga_7KL0H96E15=GS1.1.1693489616.5.1.1693489922.39.0.0; t3_sid_7709112=s1.1573758995.1693489616700.1693489932999.5.7
+Origin:
+https://kontur.ru
+Referer:
+https://kontur.ru/
+Sec-Ch-Ua:
+"Chromium";v="116", "Not)A;Brand";v="24", "Google Chrome";v="116"
+Sec-Ch-Ua-Mobile:
+?0
+Sec-Ch-Ua-Platform:
+"Windows"
+Sec-Fetch-Dest:
+document
+Sec-Fetch-Mode:
+navigate
+Sec-Fetch-Site:
+same-site
+Sec-Fetch-User:
+?1
+Upgrade-Insecure-Requests:
+1
+User-Agent:
+Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36
+
+
+
+
+параметры строки запроса
+utm_referer: www.google.com
+utm_source: google
+utm_medium: organic
+utm_startpage: kontur.ru/elba
+utm_orderpage: kontur.ru/elba
+from: kontur.ru-registration
+back: https://kontur.ru/
+p: w19854
+
+
+данные форм
+login: direkt-killer1@ya.ru
+password: ry2dw14gva9
+promocode: w19854
+
+   ВТорая форма выбор организации
+
+
+
+
+
+
+
+
+    '''
+
+
+class DevelopTest(TestCase):
+    def test_0(self):
+        inn = '800009370'
+        print(mutation_inn(inn))
+
+
+class PSBdtfmqueueTestCase(TestCase):
+    def test_0(self):
+        json_dict = {
+            "inns": ['272322168097']
+        }
+        obj = PSBdfmqueue(json_dict, False).get_obj_rezult()
+        print(obj.response.text)
+        print()
+
+    def test_1(self):
+        obj = PSBdfmqueueid(20230, False).get_obj_rezult()
+        print(obj.response.text)
+        print()
+
+class VTBBigFatherTwoTestCase(TestCase):
+    def test_0(self):
+        pass
+
+
+class KombinatorTestCase(TestCase):
+    def test_0(self):
+        surname = 'Александров'
+        first_name = 'Николай'
+        patronomic = 'Владимирович'
+        phone = '777'
+        mail = 't@mail.ru'
+        name_company = 'ИП Александров'
+        adress = 'город Барнаул'
+        comment = 'тестовый коммент'
+
+        test = True
+        obj = Kombinator(surname, first_name, patronomic, phone, mail, name_company, adress, comment, test).get_obj_rezult()
+        print(obj.rezult)
+        print(obj.response_json)
