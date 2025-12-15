@@ -234,7 +234,7 @@ class VTBToken(VTBBigFather):
 
 class VTBFather(Aut, VTBBigFather):
     ERROR_AUT_KEY_VAL_CHOICES = (
-
+        ('errorMessage', 'Internal error. See log for details'),
         ('reason', 'Unauthorized'),
         ('errorMessage', 'the header <Authorization> was not received in the request'),
         ('error', 'key not authorized: no matching policy found')
